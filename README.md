@@ -51,7 +51,7 @@ il `config.js` dentro questa cartella con quello nuovo.
 5. **Settings** → **Pages** → in *Source* scegli **Deploy from a branch**,
    ramo **main** e cartella **/ (root)** → **Save**.
 6. Dopo circa un minuto la pagina è online su:
-   **`https://itavix.github.io/links/`**
+   **https://itavix.github.io/links/**
 
 **Le volte dopo**, per aggiornare i link basta sostituire un file solo:
 apri `config.js` su GitHub → icona della **matita** → incolla il contenuto
