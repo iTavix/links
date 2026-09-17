@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>iTavix — tutti i link</title>
+<meta name="description" content="Tutti i link di iTavix: Instagram, Threads, istruzioni dei MOC su Rebrickable e progetti LEGO Ideas.">
+<meta name="robots" content="index, follow">
+
+<!-- Anteprima quando il link viene condiviso. Quando saprai l'indirizzo
+     definitivo, sostituisci il percorso di og:image con quello assoluto
+     (es. https://itavix.github.io/links/assets/logo.png). -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="iTavix — tutti i link">
+<meta property="og:description" content="News e MOC dal mondo LEGO®: Instagram, Threads, Rebrickable, LEGO Ideas.">
+<meta property="og:image" content="assets/logo.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" href="assets/logo.png">
+<link rel="apple-touch-icon" href="assets/logo.png">
+
+<script src="icone.js"></script>
+<script src="config.js"></script>
+
+<!-- Tema e accento applicati prima del paint, per non avere il flash bianco. -->
+<script>
+(function () {
+  try {
+    var t = (window.CONFIG && CONFIG.tema) || {};
+    var salvato = null;
+    try { salvato = localStorage.getItem('itavix-lib-tema'); } catch (e) {}
+    var modo = salvato || t.modo || 'auto';
+    var scuro = modo === 'scuro' ||
+      (modo === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    if (scuro) {
+      document.documentElement.classList.add('scuro');
+      document.documentElement.style.colorScheme = 'dark';
+    }
+    if (t.accento) document.documentElement.style.setProperty('--accento', t.accento);
+    if (t.sfondo) document.documentElement.dataset.sfondo = t.sfondo;
+  } catch (e) {}
+})();
+</script>
+
+<style>
+/* ---------- token ---------- */
+:root{
+  --accento:#C7391F;
+  --accento-vivo:color-mix(in oklab, var(--accento) 74%, #ff9d4d);
+  --accento-tenue:color-mix(in srgb, var(--accento) 11%, transparent);
+  --su-accento:#fff;
+
+  --bg:#f4f2f1;
+  --superficie:#fff;
+  --superficie-2:rgba(255,255,255,.7);
+  --testo:#17161a;
+  --testo-2:#6c6a74;
+  --bordo:rgba(20,18,25,.09);
+  --bordo-forte:rgba(20,18,25,.18);
+  --ombra-1:0 1px 2px rgba(20,18,25,.05), 0 10px 24px -18px rgba(20,18,25,.5);
+  --ombra-2:0 2px 4px rgba(20,18,25,.06), 0 18px 34px -18px rgba(20,18,25,.45);
+  --raggio:18px;
+}
+:root.scuro{
+  --bg:#0b0b0d;
+  --superficie:#161619;
+  --superficie-2:rgba(30,30,34,.6);
+  --testo:#f3f2f5;
+  --testo-2:#9b99a4;
+  --bordo:rgba(255,255,255,.1);
+  --bordo-forte:rgba(255,255,255,.22);
+  --ombra-1:0 1px 2px rgba(0,0,0,.4), 0 10px 26px -18px rgba(0,0,0,.9);
+  --ombra-2:0 2px 6px rgba(0,0,0,.5), 0 20px 40px -18px rgba(0,0,0,1);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  min-height:100svh;
+  background:var(--bg);
+  color:var(--testo);
+  font:400 16px/1.5 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+a{color:inherit}
+:focus-visible{outline:2.5px solid var(--accento);outline-offset:3px;border-radius:12px}
+
+/* ---------- sfondo ---------- */
+.sfondo{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(76px);opacity:.42}
+:root.scuro .blob{opacity:.22}
+.b1{width:60vmax;height:60vmax;left:-22vmax;top:-26vmax;background:var(--accento);animation:deriva 26s ease-in-out infinite alternate}
+.b2{width:48vmax;height:48vmax;right:-20vmax;top:12vmax;background:var(--accento-vivo);animation:deriva 32s ease-in-out infinite alternate-reverse}
+.b3{width:44vmax;height:44vmax;left:8vmax;bottom:-24vmax;background:color-mix(in oklab,var(--accento) 45%,#3b6ff5);animation:deriva 38s ease-in-out infinite alternate}
+@keyframes deriva{from{transform:none}to{transform:translate3d(6vmax,4vmax,0) scale(1.14)}}
+:root[data-sfondo="pulito"] .sfondo{display:none}
+:root[data-sfondo="sfumatura"] .b2,:root[data-sfondo="sfumatura"] .b3{display:none}
+:root[data-sfondo="sfumatura"] .b1{width:130vw;height:52vh;left:-15vw;top:-18vh;animation:none;filter:blur(90px)}
+
+/* ---------- impalcatura ---------- */
+.wrap{
+  position:relative;z-index:1;
+  max-width:480px;margin:0 auto;
+  padding:calc(14px + env(safe-area-inset-top)) 20px calc(44px + env(safe-area-inset-bottom));
+}
+.barra{display:flex;justify-content:flex-end;gap:8px;min-height:38px}
+.tondo{
+  display:grid;place-items:center;width:38px;height:38px;flex:0 0 38px;
+  background:var(--superficie-2);border:1px solid var(--bordo);border-radius:50%;
+  color:var(--testo-2);cursor:pointer;
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  transition:color .2s,border-color .2s,transform .2s
+}
+.tondo:hover{color:var(--accento);border-color:var(--bordo-forte)}
+.tondo:active{transform:scale(.92)}
+.ico{width:20px;height:20px;display:block}
+
+/* ---------- profilo ---------- */
+.profilo{text-align:center;margin:10px 0 22px}
+.avatar{
+  width:104px;height:104px;margin:0 auto 16px;
+  border-radius:50%;overflow:hidden;
+  background:var(--superficie);
+  border:1px solid var(--bordo);
+  box-shadow:0 0 0 5px var(--accento-tenue), var(--ombra-2);
+  display:grid;place-items:center;
+}
+.avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.avatar.contiene{width:170px;height:106px;border-radius:28px;padding:11px}
+.avatar.contiene img{object-fit:contain}
+.profilo h1{
+  margin:0;font-size:27px;line-height:1.2;font-weight:700;letter-spacing:-.022em;
+  display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap
+}
+.spunta-blu{width:19px;height:19px;color:var(--accento);flex:0 0 auto}
+.handle{margin:5px 0 0;font-size:14.5px;font-weight:500;color:var(--accento)}
+.bio{margin:12px auto 0;max-width:36ch;font-size:15px;line-height:1.55;color:var(--testo-2);text-wrap:pretty}
+
+/* ---------- social ---------- */
+.social{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin:20px 0 26px}
+.social a{
+  display:grid;place-items:center;width:44px;height:44px;
+  border-radius:50%;background:var(--superficie);border:1px solid var(--bordo);
+  color:var(--testo-2);box-shadow:var(--ombra-1);
+  transition:transform .25s cubic-bezier(.22,.68,0,1),color .25s,border-color .25s
+}
+.social a:hover{transform:translateY(-3px);color:var(--accento);border-color:var(--bordo-forte)}
+.social a:active{transform:translateY(0) scale(.94)}
+.social .ico{width:21px;height:21px}
+
+/* ---------- pulsanti link ---------- */
+.lista{display:flex;flex-direction:column;gap:12px}
+.card{
+  position:relative;overflow:hidden;
+  display:flex;align-items:center;gap:14px;
+  padding:13px 14px;min-height:66px;
+  background:var(--superficie);border:1px solid var(--bordo);border-radius:var(--raggio);
+  box-shadow:var(--ombra-1);text-decoration:none;
+  transition:transform .28s cubic-bezier(.22,.68,0,1),box-shadow .28s,border-color .28s;
+  animation:entra .5s cubic-bezier(.22,.68,0,1) both;
+  animation-delay:calc(var(--i,0) * 55ms);
+}
+@keyframes entra{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@media (hover:hover){.card:hover{transform:translateY(-3px);box-shadow:var(--ombra-2);border-color:var(--bordo-forte)}}
+.card:active{transform:translateY(0) scale(.985)}
+.bolla{
+  display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;
+  border-radius:13px;background:var(--accento-tenue);color:var(--accento)
+}
+.bolla .ico{width:21px;height:21px}
+.testi{flex:1 1 auto;min-width:0}
+.titolo{display:block;font-size:15.5px;font-weight:600;letter-spacing:-.011em;line-height:1.3}
+.sotto{
+  margin-top:3px;font-size:13px;line-height:1.35;color:var(--testo-2);
+  overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical
+}
+.freccia{flex:0 0 auto;color:var(--testo-2);opacity:.55;transition:transform .28s,opacity .28s}
+.card:hover .freccia{transform:translateX(3px);opacity:1}
+.badge{
+  flex:0 0 auto;align-self:flex-start;margin-top:2px;
+  padding:3px 8px;border-radius:999px;font-size:10.5px;font-weight:700;letter-spacing:.055em;
+  background:var(--accento);color:var(--su-accento);text-transform:uppercase
+}
+
+/* evidenziato */
+.card.top{
+  background:linear-gradient(118deg,var(--accento),var(--accento-vivo));
+  border-color:transparent;color:var(--su-accento);
+  box-shadow:0 12px 32px -12px color-mix(in srgb,var(--accento) 70%,transparent)
+}
+.card.top .bolla{background:rgba(255,255,255,.2);color:var(--su-accento)}
+.card.top .sotto,.card.top .freccia{color:rgba(255,255,255,.82)}
+.card.top .badge{background:rgba(255,255,255,.22)}
+.card.top::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.28) 50%,transparent 62%);
+  transform:translateX(-100%);animation:luccichio 5.5s ease-in-out 1.4s infinite
+}
+@keyframes luccichio{0%{transform:translateX(-100%)}22%,100%{transform:translateX(100%)}}
+
+/* ---------- piede ---------- */
+.pie{margin:30px 0 0;text-align:center;font-size:12px;line-height:1.5;color:var(--testo-2);opacity:.8;text-wrap:pretty}
+
+/* ---------- toast ---------- */
+.toast{
+  position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom));z-index:9;
+  transform:translate(-50%,14px);opacity:0;pointer-events:none;
+  display:flex;align-items:center;gap:8px;
+  padding:11px 17px;border-radius:999px;
+  background:var(--testo);color:var(--bg);font-size:13.5px;font-weight:500;
+  box-shadow:var(--ombra-2);transition:opacity .28s,transform .28s
+}
+.toast.su{opacity:1;transform:translate(-50%,0)}
+.toast .ico{width:16px;height:16px}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+</style>
+</head>
+
+<body>
+<div class="sfondo" aria-hidden="true"><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span></div>
+
+<main class="wrap">
+  <div class="barra" id="barra"></div>
+  <header class="profilo" id="profilo"></header>
+  <nav class="social" id="social" aria-label="Profili social"></nav>
+  <div class="lista" id="lista"></div>
+  <footer class="pie" id="pie"></footer>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ==================================================================
+   Render della pagina a partire da window.CONFIG.
+   Tutto passa da qui, così l'editor (admin.html) può rifare
+   l'anteprima dal vivo mandando una config via postMessage.
+   ================================================================== */
+(function () {
+  var C = window.CONFIG || {};
+  var ANTEPRIMA = window.parent !== window && location.search.indexOf('anteprima') > -1;
+
+  var $ = function (s) { return document.querySelector(s); };
+  var esc = function (s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  };
+  /* Non mandiamo mai in un href schemi strani tipo javascript: */
+  var urlSicuro = function (u) {
+    return /^(https?:|mailto:|tel:|sms:|\/|#)/i.test(String(u || '').trim()) ? String(u).trim() : '';
+  };
+  var svg = function (nome, cls) {
+    var d = (window.ICONE || {})[nome] || (window.ICONE || {}).link || '';
+    return '<svg class="ico ' + (cls || '') + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+           'stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>';
+  };
+
+  /* ---------- tema ---------- */
+  var CHIAVE_TEMA = 'itavix-lib-tema';
+  function scuroAttivo() { return document.documentElement.classList.contains('scuro'); }
+  function applicaTema(scuro) {
+    document.documentElement.classList.toggle('scuro', scuro);
+    document.documentElement.style.colorScheme = scuro ? 'dark' : 'light';
+    var b = $('#btn-tema');
+    if (b) {
+      b.innerHTML = svg(scuro ? 'sole' : 'luna');
+      b.setAttribute('aria-label', scuro ? 'Passa al tema chiaro' : 'Passa al tema scuro');
+    }
+  }
+
+  /* ---------- conteggio click ---------- */
+  var CHIAVE_STAT = 'itavix-lib-stat';
+  function leggiStat() {
+    try { return JSON.parse(localStorage.getItem(CHIAVE_STAT) || '{}'); } catch (e) { return {}; }
+  }
+  function salvaStat(s) {
+    try { localStorage.setItem(CHIAVE_STAT, JSON.stringify(s)); } catch (e) {}
+  }
+  function traccia(tipo, id, titolo) {
+    if (ANTEPRIMA) return;
+    var s = leggiStat();
+    s.totali = s.totali || {};
+    s.eventi = s.eventi || [];
+    if (tipo === 'click') s.totali[id] = (s.totali[id] || 0) + 1;
+    else s.visite = (s.visite || 0) + 1;
+    s.eventi.push({ t: Date.now(), tipo: tipo, id: id });
+    if (s.eventi.length > 800) s.eventi = s.eventi.slice(-800);
+    salvaStat(s);
+
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', tipo === 'click' ? 'select_link' : 'page_view',
+        { link_id: id, link_titolo: titolo || '' });
+    }
+    var ep = urlSicuro((C.analytics || {}).endpoint);
+    if (ep && navigator.sendBeacon) {
+      try {
+        navigator.sendBeacon(ep, new Blob(
+          [JSON.stringify({ tipo: tipo, id: id, titolo: titolo || '', ts: Date.now(), ref: document.referrer })],
+          { type: 'application/json' }
+        ));
+      } catch (e) {}
+    }
+  }
+  function caricaGA4() {
+    var id = String((C.analytics || {}).ga4 || '').trim();
+    if (!/^G-[A-Z0-9]{4,}$/i.test(id) || document.getElementById('ga4')) return;
+    var s = document.createElement('script');
+    s.id = 'ga4'; s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(id);
+    document.head.appendChild(s);
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () { window.dataLayer.push(arguments); };
+    window.gtag('js', new Date());
+    window.gtag('config', id);
+  }
+
+  /* ---------- toast ---------- */
+  var timerToast;
+  function toast(testo, icona) {
+    var t = $('#toast');
+    t.innerHTML = svg(icona || 'spunta') + '<span>' + esc(testo) + '</span>';
+    t.classList.add('su');
+    clearTimeout(timerToast);
+    timerToast = setTimeout(function () { t.classList.remove('su'); }, 2400);
+  }
+
+  /* ---------- render ---------- */
+  function render() {
+    var p = C.profilo || {}, tema = C.tema || {}, pie = C.footer || {};
+
+    if (tema.accento) document.documentElement.style.setProperty('--accento', tema.accento);
+    document.documentElement.dataset.sfondo = tema.sfondo || 'aurora';
+
+    /* barra in alto */
+    var barra = '';
+    if (tema.mostraSelettoreTema !== false) barra += '<button class="tondo" id="btn-tema" type="button"></button>';
+    if (pie.mostraCondividi !== false) barra += '<button class="tondo" id="btn-cond" type="button" aria-label="Condividi questa pagina">' + svg('condividi') + '</button>';
+    $('#barra').innerHTML = barra;
+
+    /* profilo */
+    $('#profilo').innerHTML =
+      (p.avatar ? '<div class="avatar' + (p.adattaAvatar === 'contain' ? ' contiene' : '') + '">' +
+        '<img src="' + esc(p.avatar) + '" alt="" loading="eager" decoding="async"></div>' : '') +
+      '<h1>' + esc(p.nome || '') +
+        (p.verificato ? svg('verificato', 'spunta-blu') : '') + '</h1>' +
+      (p.handle ? '<p class="handle">' + esc(p.handle) + '</p>' : '') +
+      (p.bio ? '<p class="bio">' + esc(p.bio) + '</p>' : '');
+
+    /* social */
+    var soc = (C.social || []).filter(function (s) { return urlSicuro(s.url); });
+    $('#social').innerHTML = soc.map(function (s) {
+      return '<a href="' + esc(urlSicuro(s.url)) + '" target="_blank" rel="noopener noreferrer me" ' +
+             'data-id="social:' + esc(s.icona) + '" data-titolo="' + esc(s.etichetta || s.icona) + '" ' +
+             'aria-label="' + esc(s.etichetta || s.icona) + '">' + svg(s.icona) + '</a>';
+    }).join('');
+    $('#social').style.display = soc.length ? '' : 'none';
+
+    /* link */
+    var link = (C.link || []).filter(function (l) { return l.attivo !== false && urlSicuro(l.url); });
+    $('#lista').innerHTML = link.map(function (l, i) {
+      return '<a class="card' + (l.evidenziato ? ' top' : '') + '" style="--i:' + i + '" ' +
+        'href="' + esc(urlSicuro(l.url)) + '" target="_blank" rel="noopener noreferrer" ' +
+        'data-id="' + esc(l.id || ('link' + i)) + '" data-titolo="' + esc(l.titolo || '') + '">' +
+          '<span class="bolla">' + svg(l.icona || 'link') + '</span>' +
+          '<span class="testi">' +
+            '<span class="titolo">' + esc(l.titolo || '') + '</span>' +
+            (l.sottotitolo ? '<span class="sotto">' + esc(l.sottotitolo) + '</span>' : '') +
+          '</span>' +
+          (l.badge ? '<span class="badge">' + esc(l.badge) + '</span>' : '') +
+          svg('freccia', 'freccia') +
+        '</a>';
+    }).join('');
+
+    /* piede */
+    $('#pie').innerHTML = pie.testo ? esc(pie.testo) : '';
+
+    applicaTema(scuroAttivo());
+    collega();
+  }
+
+  /* ---------- eventi ---------- */
+  function collega() {
+    var bt = $('#btn-tema');
+    if (bt) bt.onclick = function () {
+      var nuovo = !scuroAttivo();
+      applicaTema(nuovo);
+      try { localStorage.setItem(CHIAVE_TEMA, nuovo ? 'scuro' : 'chiaro'); } catch (e) {}
+    };
+
+    var bc = $('#btn-cond');
+    if (bc) bc.onclick = async function () {
+      var dati = { title: (C.profilo || {}).nome || document.title, url: location.href };
+      if (navigator.share) { try { await navigator.share(dati); return; } catch (e) { if (e.name === 'AbortError') return; } }
+      try { await navigator.clipboard.writeText(location.href); toast('Link copiato'); }
+      catch (e) { toast('Copia il link dalla barra del browser', 'link'); }
+    };
+
+    document.querySelectorAll('.card, .social a').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        if (ANTEPRIMA) { e.preventDefault(); return; }
+        traccia('click', a.dataset.id, a.dataset.titolo);
+      });
+    });
+  }
+
+  /* ---------- anteprima dall'editor ---------- */
+  window.addEventListener('message', function (e) {
+    if (!e.data || e.data.tipo !== 'anteprima' || e.source !== window.parent) return;
+    C = e.data.config || {};
+    render();
+  });
+
+  render();
+  if (!ANTEPRIMA) { caricaGA4(); traccia('visita', 'pagina', ''); }
+})();
+</script>
+</body>
+</html>

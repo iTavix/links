@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Editor — link in bio</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="assets/logo.png">
+<script src="icone.js"></script>
+<script src="config.js"></script>
+<style>
+:root{
+  --accento:#C7391F;
+  --bg:#f1f0ef; --pannello:#fff; --pannello-2:#f7f6f5;
+  --testo:#17161a; --testo-2:#6c6a74;
+  --bordo:rgba(20,18,25,.11); --bordo-2:rgba(20,18,25,.2);
+  --ombra:0 1px 2px rgba(20,18,25,.05),0 12px 28px -20px rgba(20,18,25,.6);
+  --ok:#1a8a4a; --ko:#c0392b;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0c0c0e; --pannello:#161619; --pannello-2:#1d1d21;
+    --testo:#f3f2f5; --testo-2:#9b99a4;
+    --bordo:rgba(255,255,255,.11); --bordo-2:rgba(255,255,255,.22);
+    --ombra:0 1px 2px rgba(0,0,0,.5),0 12px 28px -20px rgba(0,0,0,1);
+    --ok:#35c07a; --ko:#ff6b5b;
+  }
+}
+*,*::before,*::after{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--testo);
+  font:400 15px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+:focus-visible{outline:2.5px solid var(--accento);outline-offset:2px;border-radius:8px}
+.ico{width:18px;height:18px;display:block;flex:0 0 auto}
+
+/* ---------- intestazione ---------- */
+header.top{
+  position:sticky;top:0;z-index:20;
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:12px 20px;background:color-mix(in srgb,var(--bg) 82%,transparent);
+  -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--bordo);
+}
+.top h1{margin:0;font-size:16px;font-weight:650;letter-spacing:-.01em;display:flex;align-items:center;gap:9px}
+.top h1 .punto{width:9px;height:9px;border-radius:50%;background:var(--accento)}
+.tab{display:flex;gap:3px;background:var(--pannello-2);border:1px solid var(--bordo);border-radius:11px;padding:3px}
+.tab button{
+  border:0;background:transparent;color:var(--testo-2);cursor:pointer;
+  padding:7px 13px;border-radius:8px;font:inherit;font-size:13.5px;font-weight:550;white-space:nowrap
+}
+.tab button[aria-selected="true"]{background:var(--pannello);color:var(--testo);box-shadow:var(--ombra)}
+.spazio{flex:1 1 auto}
+
+/* ---------- pulsanti ---------- */
+button.b{
+  display:inline-flex;align-items:center;gap:7px;justify-content:center;
+  padding:9px 14px;border-radius:10px;border:1px solid var(--bordo);
+  background:var(--pannello);color:var(--testo);font:inherit;font-size:13.5px;font-weight:550;cursor:pointer;
+  transition:border-color .2s,transform .12s,background .2s
+}
+button.b:hover{border-color:var(--bordo-2)}
+button.b:active{transform:scale(.97)}
+button.b.pieno{background:var(--accento);border-color:transparent;color:#fff}
+button.b.pieno:hover{filter:brightness(1.08)}
+button.b.fantasma{background:transparent}
+button.b.pericolo{color:var(--ko)}
+button.icona{padding:7px;width:32px;height:32px}
+
+/* ---------- layout ---------- */
+.griglia{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:24px;padding:22px 20px 60px;max-width:1280px;margin:0 auto;align-items:start}
+@media (max-width:1000px){
+  .griglia{grid-template-columns:minmax(0,1fr)}
+  .colonna-anteprima{position:static;order:1}
+  .telefono{margin:0 auto;width:330px;height:640px;border-radius:38px}
+}
+.colonna-anteprima{position:sticky;top:76px}
+.pannello{background:var(--pannello);border:1px solid var(--bordo);border-radius:16px;box-shadow:var(--ombra)}
+.pannello + .pannello{margin-top:16px}
+.pannello > h2{
+  margin:0;padding:15px 18px;font-size:13px;font-weight:650;letter-spacing:.03em;text-transform:uppercase;
+  color:var(--testo-2);border-bottom:1px solid var(--bordo)
+}
+.corpo{padding:16px 18px}
+.vista{display:none}
+.vista.attiva{display:block}
+
+/* ---------- campi ---------- */
+label.campo{display:block;margin-bottom:13px}
+label.campo > span{display:block;margin-bottom:5px;font-size:12.5px;font-weight:600;color:var(--testo-2)}
+input[type=text],input[type=url],input[type=color],textarea,select{
+  width:100%;padding:9px 11px;border:1px solid var(--bordo);border-radius:10px;
+  background:var(--pannello-2);color:inherit;font:inherit;font-size:14px
+}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--accento);outline-offset:-1px;border-color:transparent}
+textarea{resize:vertical;min-height:74px;line-height:1.45}
+input[type=color]{padding:3px;height:40px;cursor:pointer}
+.duecol{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+@media (max-width:560px){.duecol{grid-template-columns:1fr}}
+.aiuto{margin:-7px 0 13px;font-size:12px;line-height:1.45;color:var(--testo-2)}
+
+/* interruttore */
+.switch{display:flex;align-items:center;gap:9px;cursor:pointer;font-size:13.5px;font-weight:500;user-select:none}
+.switch input{position:absolute;opacity:0;pointer-events:none}
+.switch .pista{
+  width:40px;height:23px;flex:0 0 40px;border-radius:999px;background:var(--bordo-2);
+  position:relative;transition:background .22s
+}
+.switch .pista::after{
+  content:"";position:absolute;top:2.5px;left:2.5px;width:18px;height:18px;border-radius:50%;
+  background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.35);transition:transform .22s
+}
+.switch input:checked + .pista{background:var(--accento)}
+.switch input:checked + .pista::after{transform:translateX(17px)}
+.switch input:focus-visible + .pista{outline:2.5px solid var(--accento);outline-offset:2px}
+
+/* ---------- righe link ---------- */
+.righe{display:flex;flex-direction:column;gap:9px}
+.riga{border:1px solid var(--bordo);border-radius:13px;background:var(--pannello-2);overflow:hidden}
+.riga.trascino{opacity:.4}
+.riga.sopra{border-color:var(--accento);box-shadow:0 0 0 3px color-mix(in srgb,var(--accento) 22%,transparent)}
+.riga.spento .intestazione .nome{opacity:.45;text-decoration:line-through}
+.intestazione{display:flex;align-items:center;gap:10px;padding:10px 11px;cursor:pointer}
+.maniglia{cursor:grab;color:var(--testo-2);opacity:.5;padding:2px;touch-action:none}
+.maniglia:active{cursor:grabbing}
+.pallino{
+  display:grid;place-items:center;width:34px;height:34px;flex:0 0 34px;border-radius:10px;
+  background:color-mix(in srgb,var(--accento) 12%,transparent);color:var(--accento)
+}
+.riga.evid .pallino{background:var(--accento);color:#fff}
+.nome{flex:1 1 auto;min-width:0;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nome small{display:block;font-weight:400;font-size:11.5px;color:var(--testo-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chevron{color:var(--testo-2);transition:transform .22s}
+.riga.aperta .chevron{transform:rotate(90deg)}
+.dettagli{display:none;padding:4px 13px 14px;border-top:1px solid var(--bordo)}
+.riga.aperta .dettagli{display:block}
+.azioni-riga{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:4px}
+
+/* selettore icone */
+.modale{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:20px;background:rgba(10,10,12,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.modale[hidden]{display:none!important}
+.modale .scatola{width:min(520px,100%);max-height:80vh;overflow:auto;background:var(--pannello);border-radius:18px;border:1px solid var(--bordo);box-shadow:0 30px 70px -20px rgba(0,0,0,.6)}
+.griglia-icone{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px;padding:16px}
+.griglia-icone button{
+  aspect-ratio:1;display:grid;place-items:center;gap:0;
+  border:1px solid var(--bordo);border-radius:12px;background:var(--pannello-2);color:var(--testo-2);cursor:pointer
+}
+.griglia-icone button:hover{border-color:var(--accento);color:var(--accento)}
+.griglia-icone button[aria-pressed="true"]{background:var(--accento);border-color:transparent;color:#fff}
+.griglia-icone .ico{width:22px;height:22px}
+
+/* ---------- anteprima ---------- */
+.telefono{
+  width:376px;max-width:100%;height:748px;max-height:min(748px,78vh);
+  background:#111;border-radius:42px;padding:11px;
+  box-shadow:0 40px 80px -40px rgba(0,0,0,.65),0 0 0 1px rgba(255,255,255,.06) inset;
+  position:relative
+}
+.telefono::before{
+  content:"";position:absolute;top:20px;left:50%;transform:translateX(-50%);
+  width:96px;height:26px;background:#111;border-radius:999px;z-index:2
+}
+.telefono iframe{width:100%;height:100%;border:0;border-radius:32px;background:#fff;display:block}
+.sotto-anteprima{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+
+/* ---------- statistiche ---------- */
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:11px;margin-bottom:18px}
+.kpi div{background:var(--pannello-2);border:1px solid var(--bordo);border-radius:12px;padding:13px 14px}
+.kpi b{display:block;font-size:26px;font-weight:680;letter-spacing:-.02em;line-height:1.1}
+.kpi span{font-size:12px;color:var(--testo-2)}
+.barre{display:flex;flex-direction:column;gap:11px}
+.barra-riga{display:grid;grid-template-columns:minmax(0,1fr) 42px;gap:10px;align-items:center;font-size:13.5px}
+.barra-riga .etichetta{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:5px}
+.barra-riga .pista{height:8px;border-radius:999px;background:var(--pannello-2);overflow:hidden}
+.barra-riga .riempi{height:100%;border-radius:999px;background:var(--accento);transition:width .5s cubic-bezier(.22,.68,0,1)}
+.barra-riga .num{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.nota{
+  margin-top:16px;padding:12px 14px;border-radius:11px;font-size:12.5px;line-height:1.5;
+  background:color-mix(in srgb,var(--accento) 8%,transparent);
+  border:1px solid color-mix(in srgb,var(--accento) 22%,transparent);color:var(--testo-2)
+}
+.nota b{color:var(--testo)}
+
+/* ---------- esporta ---------- */
+#uscita{width:100%;min-height:300px;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre;overflow-wrap:normal;overflow-x:auto}
+ol.passi{margin:0;padding-left:20px;font-size:13.5px;line-height:1.7;color:var(--testo-2)}
+ol.passi b{color:var(--testo)}
+ol.passi code{background:var(--pannello-2);border:1px solid var(--bordo);border-radius:5px;padding:1px 5px;font-size:12.5px}
+
+/* toast */
+#toast{
+  position:fixed;left:50%;bottom:26px;z-index:60;transform:translate(-50%,12px);opacity:0;pointer-events:none;
+  display:flex;align-items:center;gap:8px;padding:11px 17px;border-radius:999px;
+  background:var(--testo);color:var(--bg);font-size:13.5px;font-weight:550;
+  box-shadow:0 18px 40px -16px rgba(0,0,0,.7);transition:opacity .25s,transform .25s
+}
+#toast.su{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1><span class="punto"></span> Editor link in bio</h1>
+  <nav class="tab" role="tablist">
+    <button role="tab" data-vista="link" aria-selected="true">Link</button>
+    <button role="tab" data-vista="profilo" aria-selected="false">Profilo &amp; tema</button>
+    <button role="tab" data-vista="stat" aria-selected="false">Statistiche</button>
+    <button role="tab" data-vista="esporta" aria-selected="false">Salva</button>
+  </nav>
+  <span class="spazio"></span>
+  <button class="b pieno" id="btn-salva-top">Salva config.js</button>
+</header>
+
+<div class="griglia">
+  <div>
+    <!-- ============ VISTA LINK ============ -->
+    <section class="vista attiva" id="vista-link">
+      <div class="pannello">
+        <h2>Pulsanti</h2>
+        <div class="corpo">
+          <div class="righe" id="righe"></div>
+          <div style="margin-top:13px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="b" id="btn-aggiungi">+ Aggiungi link</button>
+            <button class="b fantasma" id="btn-espandi">Apri/chiudi tutti</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="pannello">
+        <h2>Icone social (la riga tonda sotto la bio)</h2>
+        <div class="corpo">
+          <div class="righe" id="righe-social"></div>
+          <button class="b" id="btn-aggiungi-social" style="margin-top:13px">+ Aggiungi social</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ VISTA PROFILO ============ -->
+    <section class="vista" id="vista-profilo">
+      <div class="pannello">
+        <h2>Profilo</h2>
+        <div class="corpo">
+          <div class="duecol">
+            <label class="campo"><span>Nome</span><input type="text" data-prof="nome"></label>
+            <label class="campo"><span>Handle</span><input type="text" data-prof="handle" placeholder="@iltuonome"></label>
+          </div>
+          <label class="campo"><span>Bio</span><textarea data-prof="bio" maxlength="220"></textarea></label>
+          <p class="aiuto"><span id="conta-bio"></span> caratteri — sotto i 150 si legge meglio su telefono.</p>
+
+          <label class="campo"><span>Immagine (percorso del file o indirizzo web)</span><input type="text" data-prof="avatar"></label>
+          <div class="azioni-riga" style="margin-bottom:13px">
+            <button class="b" id="btn-immagine">Scegli un'immagine dal Mac…</button>
+            <input type="file" id="file-immagine" accept="image/*" hidden>
+          </div>
+          <div class="duecol">
+            <label class="campo"><span>Come riempire il cerchio</span>
+              <select data-prof="adattaAvatar">
+                <option value="cover">Ritaglia (foto)</option>
+                <option value="contain">Intera, con margine (logo)</option>
+              </select>
+            </label>
+            <label class="campo"><span>&nbsp;</span>
+              <label class="switch"><input type="checkbox" data-prof="verificato"><span class="pista"></span> Spunta accanto al nome</label>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="pannello">
+        <h2>Tema</h2>
+        <div class="corpo">
+          <div class="duecol">
+            <label class="campo"><span>Colore d'accento</span><input type="color" data-tema="accento"></label>
+            <label class="campo"><span>Preset</span>
+              <div style="display:flex;gap:7px;flex-wrap:wrap;padding-top:5px" id="preset-colori"></div>
+            </label>
+          </div>
+          <div class="duecol">
+            <label class="campo"><span>Tema di partenza</span>
+              <select data-tema="modo">
+                <option value="auto">Come il telefono di chi apre</option>
+                <option value="chiaro">Sempre chiaro</option>
+                <option value="scuro">Sempre scuro</option>
+              </select>
+            </label>
+            <label class="campo"><span>Sfondo</span>
+              <select data-tema="sfondo">
+                <option value="aurora">Aurora (macchie in movimento)</option>
+                <option value="sfumatura">Sfumatura in alto</option>
+                <option value="pulito">Tinta unita</option>
+              </select>
+            </label>
+          </div>
+          <label class="switch" style="margin-bottom:13px"><input type="checkbox" data-tema="mostraSelettoreTema"><span class="pista"></span> Mostra il pulsante sole/luna</label>
+          <label class="switch"><input type="checkbox" data-pie="mostraCondividi"><span class="pista"></span> Mostra il pulsante condividi</label>
+        </div>
+      </div>
+
+      <div class="pannello">
+        <h2>Piè di pagina e statistiche</h2>
+        <div class="corpo">
+          <label class="campo"><span>Testo in fondo</span><textarea data-pie="testo" style="min-height:56px"></textarea></label>
+          <label class="campo"><span>ID Google Analytics 4 (facoltativo)</span><input type="text" data-an="ga4" placeholder="G-XXXXXXXXXX"></label>
+          <p class="aiuto">Compilalo se vuoi i numeri veri di tutti i visitatori: senza, il conteggio resta locale al singolo browser.</p>
+          <label class="campo"><span>Endpoint personale (facoltativo)</span><input type="text" data-an="endpoint" placeholder="https://…"></label>
+          <p class="aiuto">Se hai un webhook tuo, ogni click ci arriva come POST JSON.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ VISTA STATISTICHE ============ -->
+    <section class="vista" id="vista-stat">
+      <div class="pannello">
+        <h2>Click registrati su questo browser</h2>
+        <div class="corpo" id="corpo-stat"></div>
+      </div>
+    </section>
+
+    <!-- ============ VISTA ESPORTA ============ -->
+    <section class="vista" id="vista-esporta">
+      <div class="pannello">
+        <h2>Come mandare online le modifiche</h2>
+        <div class="corpo">
+          <ol class="passi">
+            <li>Premi <b>Scarica config.js</b>: il file finisce nei Download.</li>
+            <li>Spostalo nella cartella <code>linkinbio</code>, sostituendo quello vecchio.</li>
+            <li>Su <b>github.com</b>, nel repository della pagina, apri <code>config.js</code> → matita → incolla il contenuto → <b>Commit changes</b>.</li>
+            <li>Dopo circa un minuto la pagina online è aggiornata.</li>
+          </ol>
+          <div class="azioni-riga" style="margin-top:16px">
+            <button class="b pieno" id="btn-scarica">Scarica config.js</button>
+            <button class="b" id="btn-copia">Copia negli appunti</button>
+            <button class="b fantasma" id="btn-importa">Carica un config.js…</button>
+            <input type="file" id="file-config" accept=".js,text/javascript" hidden>
+          </div>
+        </div>
+      </div>
+      <div class="pannello">
+        <h2>Contenuto del file</h2>
+        <div class="corpo"><textarea id="uscita" readonly spellcheck="false"></textarea></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============ ANTEPRIMA ============ -->
+  <div class="colonna-anteprima">
+    <div class="telefono"><iframe id="anteprima" src="index.html?anteprima=1" title="Anteprima della pagina"></iframe></div>
+    <div class="sotto-anteprima">
+      <button class="b fantasma" id="btn-ricarica">Ricarica anteprima</button>
+      <a class="b fantasma" href="index.html" target="_blank" style="text-decoration:none">Apri a tutto schermo ↗</a>
+    </div>
+  </div>
+</div>
+
+<!-- selettore icone -->
+<div class="modale" id="modale-icone" hidden>
+  <div class="scatola" role="dialog" aria-modal="true" aria-label="Scegli un'icona">
+    <h2 style="margin:0;padding:15px 18px;font-size:14px;border-bottom:1px solid var(--bordo)">Scegli un'icona</h2>
+    <div class="griglia-icone" id="griglia-icone"></div>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ==================================================================
+   Editor. Tutto lavora su una copia di CONFIG in memoria: l'anteprima
+   riceve la copia via postMessage a ogni modifica, e "Salva" la
+   riversa in un config.js pronto da mettere online.
+   ================================================================== */
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var esc = function (s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  };
+  var svg = function (n) {
+    return '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" ' +
+           'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+           ((window.ICONE || {})[n] || window.ICONE.link) + '</svg>';
+  };
+  var clone = function (o) { return JSON.parse(JSON.stringify(o)); };
+
+  var CHIAVE_BOZZA = 'itavix-lib-bozza';
+  var C = clone(window.CONFIG || {});
+  C.profilo = C.profilo || {}; C.tema = C.tema || {}; C.footer = C.footer || {};
+  C.analytics = C.analytics || {}; C.link = C.link || []; C.social = C.social || [];
+
+  /* bozza salvata da una sessione precedente */
+  try {
+    var b = localStorage.getItem(CHIAVE_BOZZA);
+    if (b) {
+      var bozza = JSON.parse(b);
+      if (JSON.stringify(bozza) !== JSON.stringify(C) &&
+          confirm('Ho trovato modifiche non ancora esportate dalla volta scorsa.\n\nOK = riprendo da lì.\nAnnulla = riparto dal config.js attuale.')) {
+        C = bozza;
+      }
+    }
+  } catch (e) {}
+
+  var timerToast;
+  function toast(t) {
+    var el = $('#toast');
+    el.innerHTML = svg('spunta') + '<span>' + esc(t) + '</span>';
+    el.classList.add('su');
+    clearTimeout(timerToast);
+    timerToast = setTimeout(function () { el.classList.remove('su'); }, 2300);
+  }
+
+  /* ---------- sincronizzazione ---------- */
+  var timerAnteprima;
+  function segna() {
+    try { localStorage.setItem(CHIAVE_BOZZA, JSON.stringify(C)); } catch (e) {}
+    document.documentElement.style.setProperty('--accento', C.tema.accento || '#C7391F');
+    clearTimeout(timerAnteprima);
+    timerAnteprima = setTimeout(mandaAnteprima, 90);
+    if ($('#vista-esporta').classList.contains('attiva')) $('#uscita').value = serializza();
+  }
+  function mandaAnteprima() {
+    var f = $('#anteprima');
+    if (f && f.contentWindow) f.contentWindow.postMessage({ tipo: 'anteprima', config: C }, '*');
+  }
+  $('#anteprima').addEventListener('load', mandaAnteprima);
+  $('#btn-ricarica').onclick = function () { $('#anteprima').contentWindow.location.reload(); };
+
+  /* ---------- schede ---------- */
+  $$('.tab button').forEach(function (b) {
+    b.onclick = function () {
+      $$('.tab button').forEach(function (x) { x.setAttribute('aria-selected', String(x === b)); });
+      $$('.vista').forEach(function (v) { v.classList.toggle('attiva', v.id === 'vista-' + b.dataset.vista); });
+      if (b.dataset.vista === 'esporta') $('#uscita').value = serializza();
+      if (b.dataset.vista === 'stat') disegnaStat();
+    };
+  });
+
+  /* ================= LINK ================= */
+  var aperte = {};
+  function rigaLink(l, i) {
+    return '<div class="riga' + (aperte[i] ? ' aperta' : '') + (l.evidenziato ? ' evid' : '') +
+              (l.attivo === false ? ' spento' : '') + '" data-idx="' + i + '" draggable="false">' +
+      '<div class="intestazione">' +
+        '<span class="maniglia" title="Trascina per riordinare" data-maniglia>' + svg('trascina') + '</span>' +
+        '<button class="pallino" type="button" data-scegli-icona title="Cambia icona">' + svg(l.icona || 'link') + '</button>' +
+        '<span class="nome">' + (esc(l.titolo) || '<em style="opacity:.5">Senza titolo</em>') +
+          '<small>' + (esc(l.url) || 'nessun indirizzo — non verrà mostrato') + '</small></span>' +
+        '<span class="chevron">' + svg('freccia') + '</span>' +
+      '</div>' +
+      '<div class="dettagli">' +
+        '<label class="campo"><span>Titolo</span><input type="text" data-campo="titolo" value="' + esc(l.titolo) + '"></label>' +
+        '<label class="campo"><span>Sottotitolo</span><input type="text" data-campo="sottotitolo" value="' + esc(l.sottotitolo) + '"></label>' +
+        '<label class="campo"><span>Indirizzo</span><input type="url" data-campo="url" placeholder="https://…" value="' + esc(l.url) + '"></label>' +
+        '<div class="duecol">' +
+          '<label class="campo"><span>Etichetta (facoltativa)</span><input type="text" data-campo="badge" maxlength="12" placeholder="NUOVO" value="' + esc(l.badge) + '"></label>' +
+          '<label class="campo"><span>Identificativo per le statistiche</span><input type="text" data-campo="id" value="' + esc(l.id) + '"></label>' +
+        '</div>' +
+        '<div class="azioni-riga">' +
+          '<label class="switch"><input type="checkbox" data-campo="attivo"' + (l.attivo === false ? '' : ' checked') + '><span class="pista"></span> Visibile</label>' +
+          '<label class="switch"><input type="checkbox" data-campo="evidenziato"' + (l.evidenziato ? ' checked' : '') + '><span class="pista"></span> In evidenza</label>' +
+          '<span class="spazio" style="flex:1"></span>' +
+          '<button class="b icona" type="button" data-su title="Sposta su">↑</button>' +
+          '<button class="b icona" type="button" data-giu title="Sposta giù">↓</button>' +
+          '<button class="b icona" type="button" data-copia title="Duplica">⧉</button>' +
+          '<button class="b icona pericolo" type="button" data-elimina title="Elimina">✕</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }
+  function disegnaLink() {
+    $('#righe').innerHTML = C.link.map(rigaLink).join('');
+  }
+
+  /* apertura/chiusura + pulsanti riga */
+  $('#righe').addEventListener('click', function (e) {
+    var riga = e.target.closest('.riga'); if (!riga) return;
+    var i = +riga.dataset.idx;
+
+    if (e.target.closest('[data-scegli-icona]')) { apriIcone(C.link[i], function () { disegnaLink(); segna(); }); return; }
+    if (e.target.closest('[data-elimina]')) {
+      if (!confirm('Elimino "' + (C.link[i].titolo || 'questo link') + '"?')) return;
+      C.link.splice(i, 1); aperte = {}; disegnaLink(); segna(); return;
+    }
+    if (e.target.closest('[data-copia]')) {
+      var copia = clone(C.link[i]);
+      copia.id = (copia.id || 'link') + '-2';
+      copia.titolo = copia.titolo + ' (copia)';
+      C.link.splice(i + 1, 0, copia); disegnaLink(); segna(); return;
+    }
+    if (e.target.closest('[data-su]') && i > 0) { sposta(i, i - 1); return; }
+    if (e.target.closest('[data-giu]') && i < C.link.length - 1) { sposta(i, i + 1); return; }
+    if (e.target.closest('.intestazione') && !e.target.closest('button')) {
+      aperte[i] = !aperte[i]; riga.classList.toggle('aperta'); return;
+    }
+  });
+  function sposta(da, a) {
+    C.link.splice(a, 0, C.link.splice(da, 1)[0]);
+    aperte = {}; disegnaLink(); segna();
+  }
+
+  /* modifica dei campi senza ridisegnare (altrimenti si perde il cursore) */
+  $('#righe').addEventListener('input', function (e) {
+    var el = e.target.closest('[data-campo]'); if (!el) return;
+    var riga = el.closest('.riga'), i = +riga.dataset.idx, k = el.dataset.campo;
+    C.link[i][k] = el.type === 'checkbox' ? el.checked : el.value;
+    if (k === 'titolo' || k === 'url') {
+      $('.nome', riga).innerHTML = (esc(C.link[i].titolo) || '<em style="opacity:.5">Senza titolo</em>') +
+        '<small>' + (esc(C.link[i].url) || 'nessun indirizzo — non verrà mostrato') + '</small>';
+    }
+    if (k === 'evidenziato') riga.classList.toggle('evid', el.checked);
+    if (k === 'attivo') riga.classList.toggle('spento', !el.checked);
+    segna();
+  });
+
+  /* trascinamento: si attiva solo partendo dalla maniglia */
+  var trascinata = null;
+  $('#righe').addEventListener('mousedown', function (e) {
+    var m = e.target.closest('[data-maniglia]');
+    if (m) m.closest('.riga').setAttribute('draggable', 'true');
+  });
+  $('#righe').addEventListener('dragstart', function (e) {
+    var r = e.target.closest('.riga'); if (!r) return;
+    trascinata = +r.dataset.idx; r.classList.add('trascino');
+    e.dataTransfer.effectAllowed = 'move';
+    try { e.dataTransfer.setData('text/plain', String(trascinata)); } catch (x) {}
+  });
+  $('#righe').addEventListener('dragover', function (e) {
+    e.preventDefault();
+    var r = e.target.closest('.riga'); if (!r || trascinata === null) return;
+    $$('.riga', $('#righe')).forEach(function (x) { x.classList.toggle('sopra', x === r && +x.dataset.idx !== trascinata); });
+  });
+  $('#righe').addEventListener('drop', function (e) {
+    e.preventDefault();
+    var r = e.target.closest('.riga');
+    if (r && trascinata !== null && +r.dataset.idx !== trascinata) sposta(trascinata, +r.dataset.idx);
+    trascinata = null;
+  });
+  $('#righe').addEventListener('dragend', function () {
+    trascinata = null;
+    $$('.riga', $('#righe')).forEach(function (x) {
+      x.classList.remove('trascino', 'sopra'); x.setAttribute('draggable', 'false');
+    });
+  });
+
+  $('#btn-aggiungi').onclick = function () {
+    C.link.push({
+      id: 'link-' + (C.link.length + 1), titolo: 'Nuovo link', sottotitolo: '',
+      url: '', icona: 'link', evidenziato: false, badge: '', attivo: true
+    });
+    aperte = {}; aperte[C.link.length - 1] = true;
+    disegnaLink(); segna();
+    var righe = $$('.riga', $('#righe'));
+    righe[righe.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+  $('#btn-espandi').onclick = function () {
+    var apriTutte = $$('.riga.aperta').length < C.link.length;
+    C.link.forEach(function (_, i) { aperte[i] = apriTutte; });
+    disegnaLink();
+  };
+
+  /* ================= SOCIAL ================= */
+  function disegnaSocial() {
+    $('#righe-social').innerHTML = C.social.map(function (s, i) {
+      return '<div class="riga" data-idx="' + i + '">' +
+        '<div class="intestazione" style="cursor:default">' +
+          '<button class="pallino" type="button" data-scegli-icona title="Cambia icona">' + svg(s.icona || 'link') + '</button>' +
+          '<span style="flex:1;min-width:0"><input type="url" data-soc="url" placeholder="https://…" value="' + esc(s.url) + '"></span>' +
+          '<button class="b icona pericolo" type="button" data-elimina title="Elimina">✕</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+  $('#righe-social').addEventListener('click', function (e) {
+    var riga = e.target.closest('.riga'); if (!riga) return;
+    var i = +riga.dataset.idx;
+    if (e.target.closest('[data-scegli-icona]')) {
+      apriIcone(C.social[i], function () {
+        C.social[i].etichetta = C.social[i].icona;
+        disegnaSocial(); segna();
+      });
+    }
+    if (e.target.closest('[data-elimina]')) { C.social.splice(i, 1); disegnaSocial(); segna(); }
+  });
+  $('#righe-social').addEventListener('input', function (e) {
+    var el = e.target.closest('[data-soc]'); if (!el) return;
+    C.social[+el.closest('.riga').dataset.idx].url = el.value;
+    segna();
+  });
+  $('#btn-aggiungi-social').onclick = function () {
+    C.social.push({ icona: 'link', url: '', etichetta: 'link' });
+    disegnaSocial(); segna();
+  };
+
+  /* ================= SELETTORE ICONE ================= */
+  var suScelta = null, oggettoIcona = null;
+  function apriIcone(oggetto, poi) {
+    oggettoIcona = oggetto; suScelta = poi;
+    $('#griglia-icone').innerHTML = (window.ICONE_SCEGLIBILI || []).map(function (n) {
+      return '<button type="button" data-n="' + n + '" title="' + n + '" ' +
+             'aria-pressed="' + (oggetto.icona === n) + '">' + svg(n) + '</button>';
+    }).join('');
+    $('#modale-icone').hidden = false;
+  }
+  $('#griglia-icone').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-n]'); if (!b) return;
+    oggettoIcona.icona = b.dataset.n;
+    $('#modale-icone').hidden = true;
+    if (suScelta) suScelta();
+  });
+  $('#modale-icone').addEventListener('click', function (e) {
+    if (e.target === $('#modale-icone')) $('#modale-icone').hidden = true;
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') $('#modale-icone').hidden = true;
+  });
+
+  /* ================= PROFILO / TEMA ================= */
+  var PRESET = ['#C7391F', '#0b6bcb', '#128a5e', '#7b3fe4', '#d4820a', '#c2185b', '#111827'];
+  $('#preset-colori').innerHTML = PRESET.map(function (c) {
+    return '<button type="button" class="b icona" data-c="' + c + '" title="' + c + '" ' +
+           'style="background:' + c + ';border-color:transparent;width:26px;height:26px;padding:0;border-radius:8px"></button>';
+  }).join('');
+  $('#preset-colori').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-c]'); if (!b) return;
+    C.tema.accento = b.dataset.c;
+    $('[data-tema="accento"]').value = b.dataset.c;
+    segna();
+  });
+
+  function riempiModuli() {
+    $$('[data-prof]').forEach(function (el) { metti(el, C.profilo[el.dataset.prof]); });
+    $$('[data-tema]').forEach(function (el) { metti(el, C.tema[el.dataset.tema]); });
+    $$('[data-pie]').forEach(function (el) { metti(el, C.footer[el.dataset.pie]); });
+    $$('[data-an]').forEach(function (el) { metti(el, C.analytics[el.dataset.an]); });
+    contaBio();
+  }
+  function metti(el, v) {
+    if (el.type === 'checkbox') el.checked = v !== false && v !== undefined ? !!v : false;
+    else el.value = v == null ? '' : v;
+  }
+  function contaBio() { $('#conta-bio').textContent = String((C.profilo.bio || '').length); }
+
+  document.addEventListener('input', function (e) {
+    var el = e.target, v = el.type === 'checkbox' ? el.checked : el.value;
+    if (el.dataset.prof) { C.profilo[el.dataset.prof] = v; if (el.dataset.prof === 'bio') contaBio(); }
+    else if (el.dataset.tema) C.tema[el.dataset.tema] = v;
+    else if (el.dataset.pie) C.footer[el.dataset.pie] = v;
+    else if (el.dataset.an) C.analytics[el.dataset.an] = v;
+    else return;
+    segna();
+  });
+
+  /* immagine dal disco → incorporata nel config come data URL */
+  $('#btn-immagine').onclick = function () { $('#file-immagine').click(); };
+  $('#file-immagine').onchange = function (e) {
+    var f = e.target.files[0]; if (!f) return;
+    if (f.size > 800 * 1024 && !confirm('L\'immagine pesa ' + Math.round(f.size / 1024) + ' KB e finirebbe dentro config.js.\n\nMeglio ridurla prima. Vuoi usarla comunque?')) return;
+    var r = new FileReader();
+    r.onload = function () {
+      C.profilo.avatar = r.result;
+      $('[data-prof="avatar"]').value = '(immagine incorporata nel file)';
+      segna(); toast('Immagine caricata');
+    };
+    r.readAsDataURL(f);
+  };
+
+  /* ================= STATISTICHE ================= */
+  function disegnaStat() {
+    var s = {};
+    try { s = JSON.parse(localStorage.getItem('itavix-lib-stat') || '{}'); } catch (e) {}
+    var totali = s.totali || {}, eventi = s.eventi || [];
+    var righe = C.link.map(function (l) {
+      return { nome: l.titolo || l.id, n: totali[l.id] || 0 };
+    }).concat((C.social || []).map(function (x) {
+      return { nome: (x.etichetta || x.icona) + ' (social)', n: totali['social:' + x.icona] || 0 };
+    })).sort(function (a, b) { return b.n - a.n; });
+
+    var max = Math.max.apply(null, righe.map(function (r) { return r.n; }).concat([1]));
+    var somma = righe.reduce(function (a, r) { return a + r.n; }, 0);
+    var giorno = 864e5, ora = Date.now();
+    var ultimi7 = eventi.filter(function (ev) { return ev.tipo === 'click' && ev.t > ora - 7 * giorno; }).length;
+
+    $('#corpo-stat').innerHTML =
+      '<div class="kpi">' +
+        '<div><b>' + (s.visite || 0) + '</b><span>aperture della pagina</span></div>' +
+        '<div><b>' + somma + '</b><span>click totali</span></div>' +
+        '<div><b>' + ultimi7 + '</b><span>click ultimi 7 giorni</span></div>' +
+        '<div><b>' + (s.visite ? Math.round(somma / s.visite * 100) + '%' : '—') + '</b><span>click per apertura</span></div>' +
+      '</div>' +
+      (somma === 0
+        ? '<p style="color:var(--testo-2);font-size:13.5px;margin:0">Ancora nessun click registrato qui. Apri la pagina, clicca qualche pulsante e torna in questa scheda.</p>'
+        : '<div class="barre">' + righe.map(function (r) {
+            return '<div class="barra-riga"><div><div class="etichetta">' + esc(r.nome) + '</div>' +
+              '<div class="pista"><div class="riempi" style="width:' + (r.n / max * 100) + '%"></div></div></div>' +
+              '<div class="num">' + r.n + '</div></div>';
+          }).join('') + '</div>') +
+      '<div class="nota"><b>Come leggerle.</b> Questi numeri arrivano dalla memoria di <b>questo</b> browser: ' +
+        'contano solo i click fatti da qui, non quelli dei tuoi follower. Per i dati veri di tutti compila ' +
+        'l\'ID Google Analytics in “Profilo &amp; tema”: da lì in poi ogni click viene mandato anche a GA4.</div>' +
+      '<div class="azioni-riga" style="margin-top:14px"><button class="b fantasma pericolo" id="btn-azzera">Azzera i numeri locali</button></div>';
+
+    $('#btn-azzera').onclick = function () {
+      if (!confirm('Azzero i contatori di questo browser?')) return;
+      try { localStorage.removeItem('itavix-lib-stat'); } catch (e) {}
+      disegnaStat(); toast('Contatori azzerati');
+    };
+  }
+
+  /* ================= ESPORTA / IMPORTA ================= */
+  function serializza() {
+    return '/* ==================================================================\n' +
+           '   CONFIG — generato da admin.html il ' + new Date().toLocaleString('it-IT') + '\n' +
+           '   Puoi modificarlo a mano, ma è più comodo riaprire admin.html.\n' +
+           '   ================================================================== */\n' +
+           'window.CONFIG = ' + JSON.stringify(C, null, 2) + ';\n';
+  }
+  function scarica() {
+    var blob = new Blob([serializza()], { type: 'text/javascript' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'config.js';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    ultimoSalvato = JSON.stringify(C);
+    toast('config.js scaricato');
+  }
+  $('#btn-scarica').onclick = scarica;
+  $('#btn-salva-top').onclick = scarica;
+  $('#btn-copia').onclick = async function () {
+    try { await navigator.clipboard.writeText(serializza()); ultimoSalvato = JSON.stringify(C); toast('Copiato negli appunti'); }
+    catch (e) { $('#uscita').select(); toast('Premi ora Cmd+C'); }
+  };
+  $('#btn-importa').onclick = function () { $('#file-config').click(); };
+  $('#file-config').onchange = function (e) {
+    var f = e.target.files[0]; if (!f) return;
+    var r = new FileReader();
+    r.onload = function () {
+      try {
+        var finto = {};
+        /* il file è nella forma "window.CONFIG = {...}": lo eseguiamo
+           con un finto window, così non tocca la pagina dell'editor. */
+        new Function('window', String(r.result))(finto);
+        if (!finto.CONFIG) throw new Error('niente window.CONFIG');
+        C = finto.CONFIG;
+        C.profilo = C.profilo || {}; C.tema = C.tema || {}; C.footer = C.footer || {};
+        C.analytics = C.analytics || {}; C.link = C.link || []; C.social = C.social || [];
+        aperte = {}; disegnaLink(); disegnaSocial(); riempiModuli(); segna();
+        toast('Config caricato');
+      } catch (x) {
+        alert('Non riesco a leggere questo file:\n' + x.message);
+      }
+    };
+    r.readAsText(f);
+  };
+
+  /* Avvisa solo se ci sono davvero modifiche non ancora esportate.
+     La bozza resta comunque in localStorage. */
+  var ultimoSalvato = JSON.stringify(C);
+  window.addEventListener('beforeunload', function (e) {
+    if (JSON.stringify(C) !== ultimoSalvato) { e.preventDefault(); e.returnValue = ''; }
+  });
+
+  /* ---------- avvio ---------- */
+  disegnaLink(); disegnaSocial(); riempiModuli(); segna();
+})();
+</script>
+</body>
+</html>
