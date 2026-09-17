@@ -113,6 +113,7 @@ a{color:inherit}
 }
 .tondo:hover{color:var(--accento);border-color:var(--bordo-forte)}
 .tondo:active{transform:scale(.92)}
+.tondo.matita{color:var(--accento);border-color:color-mix(in srgb,var(--accento) 35%,transparent)}
 .ico{width:20px;height:20px;display:block}
 
 /* ---------- profilo ---------- */
@@ -287,6 +288,12 @@ a{color:inherit}
            'stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>';
   };
 
+  /* Questo dispositivo ha gia' collegato il token nell'editor?
+     Se si', e' il tuo: mostriamo la matita. */
+  function haToken() {
+    try { return !!localStorage.getItem('itavix-lib-gh'); } catch (e) { return false; }
+  }
+
   /* ---------- tema ---------- */
   var CHIAVE_TEMA = 'itavix-lib-tema';
   function scuroAttivo() { return document.documentElement.classList.contains('scuro'); }
@@ -363,10 +370,12 @@ a{color:inherit}
     if (tema.accento) document.documentElement.style.setProperty('--accento', tema.accento);
     document.documentElement.dataset.sfondo = tema.sfondo || 'aurora';
 
-    /* barra in alto */
+    /* barra in alto. La matita compare solo su un dispositivo che ha gia'
+       collegato il token: per i visitatori non esiste. */
     var barra = '';
     if (tema.mostraSelettoreTema !== false) barra += '<button class="tondo" id="btn-tema" type="button"></button>';
     if (pie.mostraCondividi !== false) barra += '<button class="tondo" id="btn-cond" type="button" aria-label="Condividi questa pagina">' + svg('condividi') + '</button>';
+    if (haToken() && !ANTEPRIMA) barra += '<button class="tondo matita" id="btn-modifica" type="button" aria-label="Modifica i link">' + svg('matita') + '</button>';
     $('#barra').innerHTML = barra;
 
     /* profilo */
@@ -469,21 +478,29 @@ a{color:inherit}
     var timer = null, suggerimento = $('#premuto');
 
     function giu(ev) {
-      if (ev.button > 0) return;
+      if (ev.type === 'pointerdown' && ev.button > 0) return;
+      /* niente menu contestuale di iOS sopra l'immagine */
+      if (ev.cancelable) ev.preventDefault();
+      clearTimeout(timer);
       timer = setTimeout(function () {
         timer = null;
         suggerimento.classList.add('su');
         setTimeout(function () { suggerimento.classList.remove('su'); }, 700);
         apriEditor();
-      }, 1000);
+      }, 900);
     }
-    function su() { if (timer) { clearTimeout(timer); timer = null; } }
+    function su() { clearTimeout(timer); timer = null; }
 
+    /* Safari su iPhone a volte annulla il pointer quando gestisce il tocco
+       lungo per conto suo: teniamo anche i touch event come rete. */
     av.addEventListener('pointerdown', giu);
-    av.addEventListener('pointerup', su);
-    av.addEventListener('pointercancel', su);
-    av.addEventListener('pointerleave', su);
+    av.addEventListener('touchstart', giu, { passive: false });
+    ['pointerup', 'pointercancel', 'pointerleave', 'touchend', 'touchcancel', 'touchmove']
+      .forEach(function (e) { av.addEventListener(e, su); });
     av.addEventListener('contextmenu', function (ev) { ev.preventDefault(); });
+
+    var bm = $('#btn-modifica');
+    if (bm) bm.onclick = apriEditor;
   }
 
   $('#chiudi-editor').onclick = chiudiEditor;

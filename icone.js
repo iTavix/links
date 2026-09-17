@@ -49,6 +49,8 @@ window.ICONE = {
 
   trascina:  '<circle cx="9" cy="6" r="1.45" fill="currentColor" stroke="none"/><circle cx="15" cy="6" r="1.45" fill="currentColor" stroke="none"/><circle cx="9" cy="12" r="1.45" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="1.45" fill="currentColor" stroke="none"/><circle cx="9" cy="18" r="1.45" fill="currentColor" stroke="none"/><circle cx="15" cy="18" r="1.45" fill="currentColor" stroke="none"/>',
 
+  matita:    '<path d="M4 20h4.2l10.4-10.4a2.1 2.1 0 0 0 0-3l-1.2-1.2a2.1 2.1 0 0 0-3 0L4 15.8z"/><path d="m14.6 6.4 3 3"/>',
+
   /* --- interfaccia (non selezionabili nell'editor) --- */
   freccia:   '<path d="m9.2 5.4 6.6 6.6-6.6 6.6"/>',
   sole:      '<circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.3M12 19.1v2.3M21.4 12h-2.3M4.9 12H2.6M18.6 5.4l-1.6 1.6M7 17l-1.6 1.6M18.6 18.6 17 17M7 7 5.4 5.4"/>',
