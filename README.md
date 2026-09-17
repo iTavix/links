@@ -67,15 +67,9 @@ Un minuto ed è online.
 
 Instagram → **Modifica profilo** → **Link** → **Aggiungi link esterno** →
 incolla `https://itavix.github.io/links/` → **Fatto**.
-
-Un dettaglio: in `index.html` c'è la riga
-
-```html
-<meta property="og:image" content="assets/logo.png">
-```
-
-Quando sai l'indirizzo definitivo, sostituiscila con quello completo
-(`https://itavix.github.io/links/assets/logo.png`): così l'anteprima con il logo
+L'anteprima con il logo, quella che compare mandando il link su WhatsApp o
+Telegram, e' gia' configurata in `index.html` sull'indirizzo definitivo:
+non devi toccare niente.
 appare anche quando mandi il link su WhatsApp o Telegram.
 
 ---
