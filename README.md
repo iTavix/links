@@ -1,80 +1,70 @@
 # Link in bio — iTavix
 
 Una pagina sola con tutti i tuoi link, da mettere nella bio di Instagram.
-È un sito statico: nessun server, nessun abbonamento, nessun account da creare.
+
+**Pagina pubblica:** https://itavix.github.io/links/
+**Editor:** https://itavix.github.io/links/admin.html
 
 ```
 linkinbio/
 ├── index.html     la pagina pubblica (quella che vedono i follower)
-├── admin.html     l'editor visuale — lo apri solo tu, dal tuo Mac
-├── config.js      i tuoi dati: profilo, link, colori   ← l'unico file che cambia
+├── admin.html     l'editor: aggiungi link e pubblichi, anche dal telefono
+├── config.js      i tuoi dati: profilo, link, colori
 ├── icone.js       le 34 icone disponibili
-├── avvia-editor.command   apre l'editor con un mini server locale (piano B)
 └── assets/        logo e immagini
 ```
 
 ---
 
-## 1. Modificare la pagina
+## 1. Aggiungere o modificare i link
 
-Fai doppio clic su **`admin.html`**: si apre nel browser e da lì fai tutto col mouse.
+Apri **https://itavix.github.io/links/admin.html** da qualsiasi dispositivo,
+telefono compreso. Modifichi e premi **Salva e pubblica**: dopo una trentina
+di secondi la pagina pubblica è aggiornata. Nient'altro da fare.
 
-> Se la pagina dovesse restare bianca (alcuni browser bloccano i file affiancati
-> quando si apre direttamente da disco), fai invece doppio clic su
-> **`avvia-editor.command`**: accende un mini server locale e apre l'editor da lì.
-> La prima volta macOS chiede conferma: tasto destro → Apri → Apri.
-
-- **Link** — aggiungi, riordina (trascina la maniglia a sinistra, o usa ↑ ↓),
+- **Link** — aggiungi, riordina (trascina la maniglia a sei punti, o usa ↑ ↓),
   cambia icona, metti un link *in evidenza* o nascondilo senza cancellarlo.
 - **Profilo & tema** — nome, bio, immagine, colore d'accento, tema chiaro/scuro.
-- **Statistiche** — quali link vengono cliccati (vedi il punto 4).
-- **Salva** — genera il nuovo `config.js`.
+- **Statistiche** — quali link vengono cliccati (vedi il punto 3).
+- **Salva** — pubblica online.
 
-A destra (o sotto, se la finestra è stretta) c'è l'anteprima dal vivo: cambia mentre scrivi.
-Il lavoro in corso resta salvato nel browser, quindi se chiudi per sbaglio lo ritrovi.
+Mentre modifichi, l'anteprima accanto (o sotto, su schermo stretto) si aggiorna
+dal vivo. Il lavoro in corso resta salvato nel browser: se chiudi per sbaglio,
+lo ritrovi.
 
-Quando hai finito: **Salva config.js** → il file va nei Download → sostituisci
-il `config.js` dentro questa cartella con quello nuovo.
+### La prima volta: collegare il token
 
----
+Perché l'editor possa scrivere da solo, serve un permesso di scrittura sul
+repository. Si fa una volta sola, per dispositivo:
 
-## 2. Pubblicare su GitHub Pages (senza toccare il terminale)
+1. Apri https://github.com/settings/personal-access-tokens/new
+2. **Repository access** → *Only select repositories* → scegli `links`
+3. **Permissions** → *Repository permissions* → **Contents** → *Read and write*
+4. **Generate token**, copialo
+5. Incollalo nell'editor, scheda **Salva** → **Collega**
 
-**La prima volta:**
+Il token resta nel browser di quel dispositivo e viene mandato solo a
+`api.github.com`. È volutamente ristretto a questo solo repository: se te lo
+rubassero, il danno massimo è una modifica a questa pagina. Puoi revocarlo
+quando vuoi da https://github.com/settings/tokens, e da ogni dispositivo puoi
+usare **Scollega token**.
 
-1. Vai su **github.com**, in alto a destra **+** → **New repository**.
-2. Nome: `links` — spunta **Public** — **Create repository**.
-3. Nella pagina che si apre, clicca **uploading an existing file**.
-4. Trascina dentro il contenuto della cartella `linkinbio`
-   (`index.html`, `admin.html`, `config.js`, `icone.js` e la cartella `assets`)
-   e premi **Commit changes**.
-5. **Settings** → **Pages** → in *Source* scegli **Deploy from a branch**,
-   ramo **main** e cartella **/ (root)** → **Save**.
-6. Dopo circa un minuto la pagina è online su:
-   **https://itavix.github.io/links/**
-
-**Le volte dopo**, per aggiornare i link basta sostituire un file solo:
-apri `config.js` su GitHub → icona della **matita** → incolla il contenuto
-del nuovo file (o usa *Copia negli appunti* nell'editor) → **Commit changes**.
-Un minuto ed è online.
-
-> `admin.html` viene caricato anche online, ma non fa danni: non salva niente
-> sul sito, genera solo il file da incollare. Se preferisci, non caricarlo.
+> Se non vuoi collegare nessun token, la scheda *Salva* ha ancora
+> **Scarica config.js**: il vecchio giro manuale resta disponibile.
 
 ---
 
-## 3. Metterla nella bio di Instagram
+## 2. Metterla nella bio di Instagram
 
 Instagram → **Modifica profilo** → **Link** → **Aggiungi link esterno** →
 incolla `https://itavix.github.io/links/` → **Fatto**.
 
 L'anteprima con il logo, quella che compare mandando il link su WhatsApp o
-Telegram, è già configurata in `index.html` sull'indirizzo definitivo:
-non devi toccare niente.
+Telegram, è già configurata: non devi toccare niente.
 
 ---
 
-## 4. Le statistiche, onestamente
+## 3. Le statistiche, onestamente
 
 Il conteggio dei click è scritto nella memoria del browser di **chi clicca**.
 Quindi la scheda *Statistiche* ti mostra solo i click fatti **dal tuo** browser:
@@ -82,34 +72,34 @@ serve per controllare che tutto funzioni, non per sapere cosa fanno i follower.
 
 Per i numeri veri di tutti i visitatori, che è gratis:
 
-1. Crea una proprietà su **Google Analytics 4** (analytics.google.com).
-2. Copia l'ID, che ha la forma `G-XXXXXXXXXX`.
-3. Incollalo in *Profilo & tema* → **ID Google Analytics 4**, riesporta e ripubblica.
+1. Crea una proprietà su **Google Analytics 4** (analytics.google.com)
+2. Copia l'ID, che ha la forma `G-XXXXXXXXXX`
+3. Incollalo in *Profilo & tema* → **ID Google Analytics 4**, poi pubblica
 
 Da quel momento ogni click parte anche verso GA4 come evento `select_link`,
-con il titolo del link: lì vedi quanti sono, da dove arrivano e quando.
-
-In alternativa, se hai un tuo webhook, mettilo nel campo *Endpoint*: riceverà
-un POST JSON a ogni click.
+con il titolo del link. In alternativa, se hai un tuo webhook, mettilo nel
+campo *Endpoint*: riceverà un POST JSON a ogni click.
 
 ---
 
-## 5. Note tecniche
+## 4. Note tecniche
 
-- Nessuna libreria esterna: la pagina è un solo file HTML con CSS e JS scritti a mano,
-  così si apre subito anche con la rete lenta del cellulare.
-- Tema chiaro/scuro automatico, con pulsante per forzarlo; la scelta viene ricordata.
+- Nessuna libreria esterna: la pagina pubblica è un solo file HTML con CSS e JS
+  scritti a mano, così si apre subito anche con la rete del cellulare.
+- Tema chiaro/scuro automatico, con pulsante per forzarlo; la scelta resta ricordata.
 - Funziona da 320px in su; gli indirizzi vengono filtrati (niente `javascript:`)
   e ogni testo del config viene messo a schermo in modo sicuro.
 - Rispetta *Riduci movimento* nelle impostazioni di accessibilità.
+- L'editor salva scrivendo `config.js` via API GitHub (endpoint *Contents*),
+  con controllo dello SHA: se qualcuno ha pubblicato nel frattempo da un altro
+  dispositivo, chiede conferma prima di sovrascrivere.
 
-### Se un giorno vuoi usare `git` da terminale
+### Sviluppo in locale
 
-Su questo Mac `git`, `python3` e gli altri strumenti Xcode sono bloccati finché
-non accetti la licenza. Una volta sola, dal Terminale:
+`git` di sistema è bloccato dalla licenza Xcode non accettata: usa il binario
+reale in `/Library/Developer/CommandLineTools/usr/bin/git`. Per un server
+locale, `avvia-editor.command` oppure:
 
 ```bash
-sudo xcodebuild -license
+ruby -run -e httpd . -p 8765 --bind-address 127.0.0.1
 ```
-
-Non serve per niente di quanto scritto sopra: GitHub via browser basta e avanza.
