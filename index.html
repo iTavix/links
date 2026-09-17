@@ -213,6 +213,31 @@ a{color:inherit}
 .toast.su{opacity:1;transform:translate(-50%,0)}
 .toast .ico{width:16px;height:16px}
 
+/* ---------- editor a tutto schermo ---------- */
+.avatar{-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}
+#editor{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column}
+#editor[hidden]{display:none!important}
+#editor iframe{flex:1 1 auto;width:100%;border:0;display:block}
+#editor .testata{
+  display:flex;align-items:center;gap:10px;
+  padding:calc(9px + env(safe-area-inset-top)) 14px 9px;
+  background:var(--superficie);border-bottom:1px solid var(--bordo);
+  font-size:13.5px;font-weight:600
+}
+#editor .testata button{
+  margin-left:auto;display:inline-flex;align-items:center;gap:6px;
+  padding:7px 13px;border-radius:9px;border:1px solid var(--bordo);
+  background:var(--bg);color:var(--testo);font:inherit;font-size:13px;font-weight:600;cursor:pointer
+}
+/* suggerimento che appare tenendo premuto */
+#premuto{
+  position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:40;
+  padding:10px 18px;border-radius:999px;pointer-events:none;
+  background:var(--testo);color:var(--bg);font-size:13px;font-weight:600;
+  opacity:0;transition:opacity .2s
+}
+#premuto.su{opacity:.95}
+
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
 }
@@ -231,6 +256,10 @@ a{color:inherit}
 </main>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div id="premuto" aria-hidden="true">Apro l'editor…</div>
+<div id="editor" hidden>
+  <div class="testata"><span>Editor</span><button type="button" id="chiudi-editor">Chiudi ✕</button></div>
+</div>
 
 <script>
 /* ==================================================================
@@ -413,7 +442,58 @@ a{color:inherit}
     render();
   });
 
+  /* ---------- editor sulla stessa pagina ----------
+     Nessun secondo indirizzo da ricordare: si tiene premuto sul logo
+     per un secondo. Per i visitatori non cambia nulla, e senza token
+     l'editor non puo' comunque salvare niente. */
+  function apriEditor() {
+    var e = $('#editor');
+    if (!e.querySelector('iframe')) {
+      var f = document.createElement('iframe');
+      f.src = 'admin.html';
+      f.title = 'Editor della pagina';
+      e.appendChild(f);
+    }
+    e.hidden = false;
+    document.body.style.overflow = 'hidden';
+  }
+  function chiudiEditor() {
+    $('#editor').hidden = true;
+    document.body.style.overflow = '';
+    if (location.hash === '#edit') history.replaceState(null, '', location.pathname);
+  }
+
+  function collegaAperturaEditor() {
+    var av = $('.avatar');
+    if (!av || ANTEPRIMA) return;
+    var timer = null, suggerimento = $('#premuto');
+
+    function giu(ev) {
+      if (ev.button > 0) return;
+      timer = setTimeout(function () {
+        timer = null;
+        suggerimento.classList.add('su');
+        setTimeout(function () { suggerimento.classList.remove('su'); }, 700);
+        apriEditor();
+      }, 1000);
+    }
+    function su() { if (timer) { clearTimeout(timer); timer = null; } }
+
+    av.addEventListener('pointerdown', giu);
+    av.addEventListener('pointerup', su);
+    av.addEventListener('pointercancel', su);
+    av.addEventListener('pointerleave', su);
+    av.addEventListener('contextmenu', function (ev) { ev.preventDefault(); });
+  }
+
+  $('#chiudi-editor').onclick = chiudiEditor;
+  document.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape' && !$('#editor').hidden) chiudiEditor();
+  });
+
   render();
+  collegaAperturaEditor();
+  if (location.hash === '#edit') apriEditor();
   if (!ANTEPRIMA) { caricaGA4(); traccia('visita', 'pagina', ''); }
 })();
 </script>
