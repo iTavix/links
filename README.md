@@ -23,7 +23,10 @@ telefono compreso. Modifichi e premi **Salva e pubblica**: dopo una trentina
 di secondi la pagina pubblica è aggiornata. Nient'altro da fare.
 
 - **Link** — aggiungi, riordina (trascina la maniglia a sei punti, o usa ↑ ↓),
-  cambia icona, metti un link *in evidenza* o nascondilo senza cancellarlo.
+  metti un link *in evidenza* o nascondilo senza cancellarlo.
+- **Icona o immagine** — tocca l'icona colorata di un link: puoi scegliere fra
+  le 34 icone oppure caricare una tua foto o un logo. L'immagine viene
+  rimpicciolita nel browser e caricata in `assets/link/` quando pubblichi.
 - **Profilo & tema** — nome, bio, immagine, colore d'accento, tema chiaro/scuro.
 - **Statistiche** — quali link vengono cliccati (vedi il punto 3).
 - **Salva** — pubblica online.

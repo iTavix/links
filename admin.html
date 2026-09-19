@@ -167,6 +167,13 @@ input[type=color]{padding:3px;height:40px;cursor:pointer}
 .miniatura.vuota{color:var(--accento);background:color-mix(in srgb,var(--accento) 12%,transparent)}
 
 /* selettore icone */
+.scelta-foto{display:flex;align-items:center;gap:14px;padding:16px 18px;border-bottom:1px solid var(--bordo)}
+.scelta-foto[hidden]{display:none!important}
+.azioni-foto{display:flex;flex-direction:column;gap:7px;align-items:flex-start;min-width:0}
+.miniatura.grande{width:62px;height:62px;flex:0 0 62px;border-radius:15px}
+.miniatura.grande .ico{width:26px;height:26px}
+.titolo-griglia{padding:14px 18px 0;font-size:12px;font-weight:650;letter-spacing:.03em;text-transform:uppercase;color:var(--testo-2)}
+.titolo-griglia[hidden]{display:none!important}
 .modale{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:20px;background:rgba(10,10,12,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .modale[hidden]{display:none!important}
 .modale .scatola{width:min(520px,100%);max-height:80vh;overflow:auto;background:var(--pannello);border-radius:18px;border:1px solid var(--bordo);box-shadow:0 30px 70px -20px rgba(0,0,0,.6)}
@@ -454,7 +461,9 @@ ol.passi code{background:var(--pannello-2);border:1px solid var(--bordo);border-
 <!-- selettore icone -->
 <div class="modale" id="modale-icone" hidden>
   <div class="scatola" role="dialog" aria-modal="true" aria-label="Scegli un'icona">
-    <h2 style="margin:0;padding:15px 18px;font-size:14px;border-bottom:1px solid var(--bordo)">Scegli un'icona</h2>
+    <h2 style="margin:0;padding:15px 18px;font-size:14px;border-bottom:1px solid var(--bordo)">Icona o immagine</h2>
+    <div id="scelta-foto" class="scelta-foto" hidden></div>
+    <div class="titolo-griglia">Oppure scegli un'icona</div>
     <div class="griglia-icone" id="griglia-icone"></div>
   </div>
 </div>
@@ -597,7 +606,7 @@ ol.passi code{background:var(--pannello-2);border:1px solid var(--bordo);border-
     var riga = e.target.closest('.riga'); if (!riga) return;
     var i = +riga.dataset.idx;
 
-    if (e.target.closest('[data-scegli-icona]')) { apriIcone(C.link[i], function () { disegnaLink(); segna(); }); return; }
+    if (e.target.closest('[data-scegli-icona]')) { apriIcone(C.link[i], function () { disegnaLink(); segna(); }, i); return; }
     if (e.target.closest('[data-elimina]')) {
       if (!confirm('Elimino "' + (C.link[i].titolo || 'questo link') + '"?')) return;
       C.link.splice(i, 1); aperte = {}; disegnaLink(); segna(); return;
@@ -760,14 +769,54 @@ ol.passi code{background:var(--pannello-2);border:1px solid var(--bordo);border-
 
   /* ================= SELETTORE ICONE ================= */
   var suScelta = null, oggettoIcona = null;
-  function apriIcone(oggetto, poi) {
+  /* indice: la posizione del link, oppure null se si sta cambiando
+     l'icona di un social (li' l'immagine non ha senso). */
+  function apriIcone(oggetto, poi, indice) {
     oggettoIcona = oggetto; suScelta = poi;
+
+    var zona = $('#scelta-foto');
+    if (indice === null || indice === undefined) {
+      zona.hidden = true;
+      $('.titolo-griglia').hidden = true;
+    } else {
+      zona.hidden = false;
+      $('.titolo-griglia').hidden = false;
+      zona.innerHTML =
+        (oggetto.immagine
+          ? '<span class="miniatura grande"><img src="' + esc(oggetto.immagine) + '" alt=""></span>'
+          : '<span class="miniatura grande vuota">' + svg(oggetto.icona || 'link') + '</span>') +
+        '<div class="azioni-foto">' +
+          '<button class="b pieno" type="button" data-usa-foto="' + indice + '">' +
+            (oggetto.immagine ? 'Cambia immagine…' : 'Usa un\'immagine…') + '</button>' +
+          (oggetto.immagine
+            ? '<button class="b fantasma pericolo" type="button" data-scarta-foto="' + indice + '">Torna all\'icona</button>'
+            : '<span class="aiuto" style="margin:0">Una foto o un logo al posto dell\'icona.</span>') +
+        '</div>';
+    }
+
     $('#griglia-icone').innerHTML = (window.ICONE_SCEGLIBILI || []).map(function (n) {
       return '<button type="button" data-n="' + n + '" title="' + n + '" ' +
              'aria-pressed="' + (oggetto.icona === n) + '">' + svg(n) + '</button>';
     }).join('');
     $('#modale-icone').hidden = false;
   }
+
+  /* i due pulsanti dentro la modale */
+  $('#scelta-foto').addEventListener('click', function (e) {
+    var usa = e.target.closest('[data-usa-foto]');
+    if (usa) {
+      indiceFoto = +usa.dataset.usaFoto;
+      $('#modale-icone').hidden = true;
+      $('#file-foto-link').click();
+      return;
+    }
+    var scarta = e.target.closest('[data-scarta-foto]');
+    if (scarta) {
+      delete C.link[+scarta.dataset.scartaFoto].immagine;
+      $('#modale-icone').hidden = true;
+      disegnaLink(); segna();
+    }
+  });
   $('#griglia-icone').addEventListener('click', function (e) {
     var b = e.target.closest('button[data-n]'); if (!b) return;
     oggettoIcona.icona = b.dataset.n;
@@ -939,8 +988,8 @@ ol.passi code{background:var(--pannello-2);border:1px solid var(--bordo);border-
     el.innerHTML = '<span class="punto-stato"></span><span>' + testo + '</span>';
     el.hidden = false;
   }
-  function mostraBlocchi() {
-    var collegato = !!token();
+  function mostraBlocchi(forzaCancello) {
+    var collegato = !!token() && !forzaCancello;
     /* il cancello copre tutto finche' non c'e' un token valido */
     $('#cancello').hidden = collegato;
     document.body.style.overflow = collegato ? '' : 'hidden';
@@ -1161,15 +1210,22 @@ ol.passi code{background:var(--pannello-2);border:1px solid var(--bordo);border-
     avviato = true;
     var fresco = await configDaGitHub();
 
-    /* Token revocato o scaduto: fuori, non dentro un editor che non salva.
-       Un guasto di rete invece non deve buttare fuori nessuno. */
-    if (!fresco && esitoUltimaLettura &&
-        [401, 403, 404].indexOf(esitoUltimaLettura.codice) > -1) {
-      try { localStorage.removeItem(CHIAVE_TOKEN); } catch (e) {}
+    /* Se non riusciamo a leggere, meglio fermarsi che far lavorare
+       qualcuno dentro un editor che poi non salva. Ma il token lo
+       buttiamo solo col 401, che e' l'unica risposta che dice davvero
+       "credenziale sbagliata": il 403 arriva anche quando GitHub sta
+       solo limitando le richieste, e cancellarlo li' sarebbe un danno. */
+    if (!fresco && esitoUltimaLettura && esitoUltimaLettura.codice) {
+      var codice = esitoUltimaLettura.codice;
+      if (codice === 401) { try { localStorage.removeItem(CHIAVE_TOKEN); } catch (e) {} }
       avviato = false;
-      mostraBlocchi();
-      statoCancello('Il token non è più valido: ' + spiegaErrore(esitoUltimaLettura) +
-                    '. Generane uno nuovo.', 'ko');
+      mostraBlocchi(true);
+      statoCancello(
+        codice === 401
+          ? 'Il token non è più valido: generane uno nuovo e incollalo qui.'
+          : 'Non riesco a leggere il progetto: ' + spiegaErrore(esitoUltimaLettura) +
+            '. Il token è stato conservato: riprova fra poco.',
+        'ko');
       return;
     }
     if (fresco) C = normalizza(fresco);
