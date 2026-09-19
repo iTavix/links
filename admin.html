@@ -394,7 +394,7 @@ ol.passi code{background:var(--pannello-2);border:1px solid var(--bordo);border-
     <!-- ============ VISTA STATISTICHE ============ -->
     <section class="vista" id="vista-stat">
       <div class="pannello">
-        <h2>Click registrati su questo browser</h2>
+        <h2>Statistiche</h2>
         <div class="corpo" id="corpo-stat"></div>
       </div>
     </section>
@@ -487,17 +487,30 @@ ol.passi code{background:var(--pannello-2);border:1px solid var(--bordo);border-
   C.profilo = C.profilo || {}; C.tema = C.tema || {}; C.footer = C.footer || {};
   C.analytics = C.analytics || {}; C.link = C.link || []; C.social = C.social || [];
 
-  /* bozza salvata da una sessione precedente */
-  try {
-    var b = localStorage.getItem(CHIAVE_BOZZA);
-    if (b) {
+  function normalizza(o) {
+    o = o || {};
+    o.profilo = o.profilo || {}; o.tema = o.tema || {}; o.footer = o.footer || {};
+    o.analytics = o.analytics || {}; o.link = o.link || []; o.social = o.social || [];
+    return o;
+  }
+
+  /* La bozza vale solo se e' davvero diversa da cio' che c'e' online:
+     una bozza vecchia non deve rimangiarsi modifiche fatte altrove. */
+  function offriBozza() {
+    try {
+      var b = localStorage.getItem(CHIAVE_BOZZA);
+      if (!b) return;
       var bozza = JSON.parse(b);
-      if (JSON.stringify(bozza) !== JSON.stringify(C) &&
-          confirm('Ho trovato modifiche non ancora esportate dalla volta scorsa.\n\nOK = riprendo da lì.\nAnnulla = riparto dal config.js attuale.')) {
-        C = bozza;
+      if (JSON.stringify(bozza) === JSON.stringify(C)) { localStorage.removeItem(CHIAVE_BOZZA); return; }
+      if (confirm('In questo browser ci sono modifiche mai pubblicate.\n\n' +
+                  'OK = riprendo da quelle.\n' +
+                  'Annulla = parto dalla versione online, che e\' quella che vedono i tuoi follower.')) {
+        C = normalizza(bozza);
+      } else {
+        localStorage.removeItem(CHIAVE_BOZZA);
       }
-    }
-  } catch (e) {}
+    } catch (e) {}
+  }
 
   var timerToast;
   function toast(t) {
@@ -834,7 +847,32 @@ ol.passi code{background:var(--pannello-2);border:1px solid var(--bordo);border-
     var giorno = 864e5, ora = Date.now();
     var ultimi7 = eventi.filter(function (ev) { return ev.tipo === 'click' && ev.t > ora - 7 * giorno; }).length;
 
+    var idGA = String((C.analytics || {}).ga4 || '').trim();
+    var bloccoGA = idGA
+      ? '<div class="nota" style="margin:0 0 18px">' +
+          '<b>I numeri veri sono su Google Analytics.</b> La pagina sta inviando i dati ' +
+          'alla proprieta\' <code>' + esc(idGA) + '</code>. Qui non possono comparire: ' +
+          'l\'ID serve a <i>mandare</i> i dati, non a rileggerli, e la chiave per rileggerli ' +
+          'non puo\' stare in una pagina pubblica.' +
+          '<div class="azioni-riga" style="margin-top:12px">' +
+            '<a class="b pieno" href="https://analytics.google.com/analytics/web/" target="_blank" rel="noopener" style="text-decoration:none">Apri Google Analytics ↗</a>' +
+          '</div>' +
+          '<div style="margin-top:12px;font-size:12.5px">' +
+            'Dentro Analytics: <b>Rapporti → Tempo reale</b> per vedere chi c\'e\' adesso, ' +
+            'gli altri rapporti si popolano entro 24-48 ore. C\'e\' anche l\'app ' +
+            '<b>Google Analytics</b> per telefono, comoda per una sbirciata veloce.' +
+          '</div>' +
+        '</div>'
+      : '<div class="nota" style="margin:0 0 18px">' +
+          '<b>Nessuna statistica reale attiva.</b> Per sapere cosa fanno i tuoi follower ' +
+          'serve un ID Google Analytics: lo trovi in <b>Profilo &amp; tema</b>, in fondo. ' +
+          'Senza, resta solo il contatore locale qui sotto.' +
+        '</div>';
+
     $('#corpo-stat').innerHTML =
+      bloccoGA +
+      '<h3 style="margin:0 0 4px;font-size:14px;font-weight:650">Contatore di questo dispositivo</h3>' +
+      '<p class="aiuto" style="margin:0 0 14px">Serve solo a controllare che i click vengano registrati.</p>' +
       '<div class="kpi">' +
         '<div><b>' + (s.visite || 0) + '</b><span>aperture della pagina</span></div>' +
         '<div><b>' + somma + '</b><span>click totali</span></div>' +
@@ -848,9 +886,13 @@ ol.passi code{background:var(--pannello-2);border:1px solid var(--bordo);border-
               '<div class="pista"><div class="riempi" style="width:' + (r.n / max * 100) + '%"></div></div></div>' +
               '<div class="num">' + r.n + '</div></div>';
           }).join('') + '</div>') +
-      '<div class="nota"><b>Come leggerle.</b> Questi numeri arrivano dalla memoria di <b>questo</b> browser: ' +
-        'contano solo i click fatti da qui, non quelli dei tuoi follower. Per i dati veri di tutti compila ' +
-        'l\'ID Google Analytics in “Profilo &amp; tema”: da lì in poi ogni click viene mandato anche a GA4.</div>' +
+      (idGA
+        ? '<div class="nota" style="font-size:12px"><b>Da ricordare in Analytics.</b> Ogni click manda ' +
+          'un evento <code>select_link</code> con i parametri <code>link_titolo</code> e <code>link_id</code>. ' +
+          'Per vedere <i>quale</i> link viene cliccato nei rapporti devi registrarli una volta sola in ' +
+          '<b>Amministrazione → Definizioni personalizzate → Crea dimensione personalizzata</b> ' +
+          '(ambito <i>Evento</i>, parametro <code>link_titolo</code>). Valgono solo da quel momento in avanti.</div>'
+        : '') +
       '<div class="azioni-riga" style="margin-top:14px"><button class="b fantasma pericolo" id="btn-azzera">Azzera i numeri locali</button></div>';
 
     $('#btn-azzera').onclick = function () {
@@ -1097,10 +1139,43 @@ ol.passi code{background:var(--pannello-2);border:1px solid var(--bordo);border-
      Senza token l'editor non viene nemmeno costruito: chi arriva qui
      per caso vede solo il cancello. */
   var avviato = false;
-  function avviaEditor() {
+  /* Il config lo prendiamo da GitHub, non dal file servito al browser:
+     quello puo' arrivare dalla cache ed essere indietro, e partire da una
+     versione vecchia significherebbe ripubblicarla sopra a quella buona. */
+  var esitoUltimaLettura = null;
+  async function configDaGitHub() {
+    var r = await chiamataGitHub('/contents/' + REPO.file + '?ref=' + REPO.ramo);
+    esitoUltimaLettura = r;
+    if (!r.ok) return null;
+    shaCorrente = r.corpo.sha;
+    try {
+      var byte = Uint8Array.from(atob(String(r.corpo.content).replace(/\s/g, '')), function (c) { return c.charCodeAt(0); });
+      var finto = {};
+      new Function('window', new TextDecoder().decode(byte))(finto);
+      return finto.CONFIG || null;
+    } catch (e) { return null; }
+  }
+
+  async function avviaEditor() {
     if (avviato) return;
     avviato = true;
+    var fresco = await configDaGitHub();
+
+    /* Token revocato o scaduto: fuori, non dentro un editor che non salva.
+       Un guasto di rete invece non deve buttare fuori nessuno. */
+    if (!fresco && esitoUltimaLettura &&
+        [401, 403, 404].indexOf(esitoUltimaLettura.codice) > -1) {
+      try { localStorage.removeItem(CHIAVE_TOKEN); } catch (e) {}
+      avviato = false;
+      mostraBlocchi();
+      statoCancello('Il token non è più valido: ' + spiegaErrore(esitoUltimaLettura) +
+                    '. Generane uno nuovo.', 'ko');
+      return;
+    }
+    if (fresco) C = normalizza(fresco);
+    offriBozza();
     disegnaLink(); disegnaSocial(); riempiModuli(); segna();
+    ultimoSalvato = JSON.stringify(C);
     $('#anteprima').src = 'index.html?anteprima=1';
   }
 
