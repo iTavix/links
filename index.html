@@ -329,9 +329,10 @@ a{color:inherit}
     if (s.eventi.length > 800) s.eventi = s.eventi.slice(-800);
     salvaStat(s);
 
-    if (typeof window.gtag === 'function') {
-      window.gtag('event', tipo === 'click' ? 'select_link' : 'page_view',
-        { link_id: id, link_titolo: titolo || '' });
+    /* Solo i click: la visita la conta gia' gtag('config') da sola, e
+       mandarne una seconda a mano raddoppierebbe le visite in GA4. */
+    if (tipo === 'click' && typeof window.gtag === 'function') {
+      window.gtag('event', 'select_link', { link_id: id, link_titolo: titolo || '' });
     }
     var ep = urlSicuro((C.analytics || {}).endpoint);
     if (ep && navigator.sendBeacon) {
