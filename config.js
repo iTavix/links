@@ -1,5 +1,5 @@
 /* ==================================================================
-   CONFIG — generato da admin.html il 19/09/2026, 14:35:00
+   CONFIG — generato da admin.html il 19/09/2026, 15:05:31
    Puoi modificarlo a mano, ma è più comodo riaprire admin.html.
    ================================================================== */
 window.CONFIG = {
@@ -53,7 +53,8 @@ window.CONFIG = {
       "icona": "mattoncino",
       "evidenziato": true,
       "badge": "NUOVO",
-      "attivo": true
+      "attivo": true,
+      "immagine": "assets/link/steam-train-1789844730078.png"
     },
     {
       "id": "addams",
@@ -417,7 +418,7 @@ window.CONFIG = {
     }
   ],
   "analytics": {
-    "ga4": "G-GZF7LH671K",
+    "ga4": "",
     "endpoint": ""
   },
   "footer": {
