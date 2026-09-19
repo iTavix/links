@@ -683,18 +683,30 @@ ol.passi code{background:var(--pannello-2);border:1px solid var(--bordo);border-
      pulsante ne pesa una ventina di kilobyte. */
   var indiceFoto = null;
 
-  async function miniatura(file, lato) {
-    var url = URL.createObjectURL(file);
+  /* Due tentativi: <img> copre il caso normale, createImageBitmap se la
+     cava meglio con file grossi o formati che il primo rifiuta. */
+  async function apriImmagine(file, url) {
     try {
       var img = new Image();
       img.src = url;
       await img.decode();
+      return img;
+    } catch (e) {
+      return await createImageBitmap(file);
+    }
+  }
+
+  async function miniatura(file, lato) {
+    var url = URL.createObjectURL(file);
+    try {
+      var img = await apriImmagine(file, url);
       var c = document.createElement('canvas');
       c.width = c.height = lato;
       var x = c.getContext('2d');
       /* ritaglio centrale, come fa object-fit: cover */
-      var scala = Math.max(lato / img.naturalWidth, lato / img.naturalHeight);
-      var w = img.naturalWidth * scala, h = img.naturalHeight * scala;
+      var lw = img.naturalWidth || img.width, lh = img.naturalHeight || img.height;
+      var scala = Math.max(lato / lw, lato / lh);
+      var w = lw * scala, h = lh * scala;
       x.drawImage(img, (lato - w) / 2, (lato - h) / 2, w, h);
       var d = c.toDataURL('image/webp', 0.86);
       /* i browser che non sanno produrre webp restituiscono un png */
@@ -713,7 +725,18 @@ ol.passi code{background:var(--pannello-2);border:1px solid var(--bordo);border-
       disegnaLink(); segna();
       toast(token() ? 'Immagine pronta: premi Salva e pubblica' : 'Immagine inserita');
     } catch (x) {
-      alert('Non riesco a leggere questa immagine:\n' + x.message);
+      /* Il caso quasi sempre e' questo: le foto dell'iPhone sono HEIC,
+         che fuori da Safari non si apre. Meglio dirlo che lasciare
+         l'utente davanti a un errore tecnico. */
+      var heic = /\.(heic|heif)$/i.test(file.name) || /heic|heif/i.test(file.type);
+      alert(heic
+        ? 'Questa foto è in formato HEIC, che questo browser non sa aprire.\n\n' +
+          'Due modi per risolverla:\n' +
+          '• aprila in Foto, premi Condividi e scegli "Copia foto": la copia è JPEG\n' +
+          '• oppure iPhone → Impostazioni → Fotocamera → Formati → "Massima compatibilità",\n' +
+          '  così le nuove foto nascono già in JPEG'
+        : 'Non riesco a leggere questa immagine.\n\n' +
+          'Prova con un file JPEG, PNG o WebP.\n\nDettaglio tecnico: ' + x.message);
     }
     indiceFoto = null;
   };
