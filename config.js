@@ -1,5 +1,5 @@
 /* ==================================================================
-   CONFIG — generato da admin.html il 20/09/2026, 09:44:08
+   CONFIG — generato da admin.html il 20/09/2026, 09:53:51
    Puoi modificarlo a mano, ma è più comodo riaprire admin.html.
    ================================================================== */
 window.CONFIG = {
@@ -53,7 +53,8 @@ window.CONFIG = {
       "icona": "mattoncino",
       "evidenziato": true,
       "badge": "NUOVO",
-      "attivo": true
+      "attivo": true,
+      "immagine": "assets/link/steam-train-1789912430640.png"
     },
     {
       "id": "addams",
@@ -63,8 +64,7 @@ window.CONFIG = {
       "icona": "idea",
       "evidenziato": true,
       "badge": "VOTA",
-      "attivo": true,
-      "immagine": "assets/link/addams-1789911847653.png"
+      "attivo": true
     },
     {
       "id": "brickboy",
@@ -418,7 +418,7 @@ window.CONFIG = {
     }
   ],
   "analytics": {
-    "ga4": "G-GZF7LH671K",
+    "ga4": "",
     "endpoint": ""
   },
   "footer": {
