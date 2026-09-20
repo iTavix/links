@@ -1,5 +1,5 @@
 /* ==================================================================
-   CONFIG — generato da admin.html il 20/09/2026, 09:53:51
+   CONFIG — generato da admin.html il 20/09/2026, 09:56:37
    Puoi modificarlo a mano, ma è più comodo riaprire admin.html.
    ================================================================== */
 window.CONFIG = {
@@ -64,7 +64,8 @@ window.CONFIG = {
       "icona": "idea",
       "evidenziato": true,
       "badge": "VOTA",
-      "attivo": true
+      "attivo": true,
+      "immagine": "assets/link/addams-1789912596827.png"
     },
     {
       "id": "brickboy",
