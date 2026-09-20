@@ -1,5 +1,5 @@
 /* ==================================================================
-   CONFIG — generato da admin.html il 20/09/2026, 10:12:56
+   CONFIG — generato da admin.html il 20/09/2026, 10:21:13
    Puoi modificarlo a mano, ma è più comodo riaprire admin.html.
    ================================================================== */
 window.CONFIG = {
@@ -86,7 +86,8 @@ window.CONFIG = {
       "icona": "cuore",
       "evidenziato": false,
       "badge": "",
-      "attivo": true
+      "attivo": true,
+      "immagine": "assets/link/simpsons-tv-1789914071306.png"
     },
     {
       "id": "batmobile",
