@@ -1,5 +1,5 @@
 /* ==================================================================
-   CONFIG — generato da admin.html il 20/09/2026, 10:07:32
+   CONFIG — generato da admin.html il 20/09/2026, 10:11:14
    Puoi modificarlo a mano, ma è più comodo riaprire admin.html.
    ================================================================== */
 window.CONFIG = {
@@ -419,7 +419,7 @@ window.CONFIG = {
     }
   ],
   "analytics": {
-    "ga4": "G-GZF7LH671K",
+    "ga4": "G-KLRQSQSXPR",
     "endpoint": ""
   },
   "footer": {
