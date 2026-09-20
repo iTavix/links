@@ -1,5 +1,5 @@
 /* ==================================================================
-   CONFIG — generato da admin.html il 20/09/2026, 09:57:52
+   CONFIG — generato da admin.html il 20/09/2026, 10:07:32
    Puoi modificarlo a mano, ma è più comodo riaprire admin.html.
    ================================================================== */
 window.CONFIG = {
@@ -75,8 +75,7 @@ window.CONFIG = {
       "icona": "play",
       "evidenziato": false,
       "badge": "",
-      "attivo": true,
-      "immagine": "assets/link/brickboy-1789912671842.png"
+      "attivo": true
     },
     {
       "id": "simpsons-tv",
@@ -420,7 +419,7 @@ window.CONFIG = {
     }
   ],
   "analytics": {
-    "ga4": "",
+    "ga4": "G-GZF7LH671K",
     "endpoint": ""
   },
   "footer": {
