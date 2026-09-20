@@ -492,6 +492,7 @@ ol.passi code{background:var(--pannello-2);border:1px solid var(--bordo);border-
   var clone = function (o) { return JSON.parse(JSON.stringify(o)); };
 
   var CHIAVE_BOZZA = 'itavix-lib-bozza';
+  var CHIAVE_BOZZA_SHA = 'itavix-lib-bozza-sha';
   var C = clone(window.CONFIG || {});
   C.profilo = C.profilo || {}; C.tema = C.tema || {}; C.footer = C.footer || {};
   C.analytics = C.analytics || {}; C.link = C.link || []; C.social = C.social || [];
@@ -503,12 +504,22 @@ ol.passi code{background:var(--pannello-2);border:1px solid var(--bordo);border-
     return o;
   }
 
-  /* La bozza vale solo se e' davvero diversa da cio' che c'e' online:
-     una bozza vecchia non deve rimangiarsi modifiche fatte altrove. */
+  /* Una bozza e' utile solo se nasce dalla stessa versione che c'e'
+     online adesso. Se nel frattempo e' stato pubblicato qualcosa (da qui
+     o da un altro dispositivo), ripristinarla riporterebbe indietro
+     anche quelle modifiche: meglio buttarla. */
   function offriBozza() {
     try {
       var b = localStorage.getItem(CHIAVE_BOZZA);
       if (!b) return;
+
+      var shaBozza = localStorage.getItem(CHIAVE_BOZZA_SHA);
+      if (shaCorrente && shaBozza && shaBozza !== shaCorrente) {
+        localStorage.removeItem(CHIAVE_BOZZA);
+        localStorage.removeItem(CHIAVE_BOZZA_SHA);
+        return;
+      }
+
       var bozza = JSON.parse(b);
       if (JSON.stringify(bozza) === JSON.stringify(C)) { localStorage.removeItem(CHIAVE_BOZZA); return; }
       if (confirm('In questo browser ci sono modifiche mai pubblicate.\n\n' +
@@ -533,7 +544,10 @@ ol.passi code{background:var(--pannello-2);border:1px solid var(--bordo);border-
   /* ---------- sincronizzazione ---------- */
   var timerAnteprima;
   function segna() {
-    try { localStorage.setItem(CHIAVE_BOZZA, JSON.stringify(C)); } catch (e) {}
+    try {
+      localStorage.setItem(CHIAVE_BOZZA, JSON.stringify(C));
+      localStorage.setItem(CHIAVE_BOZZA_SHA, shaCorrente || '');
+    } catch (e) {}
     document.documentElement.style.setProperty('--accento', C.tema.accento || '#C7391F');
     clearTimeout(timerAnteprima);
     timerAnteprima = setTimeout(mandaAnteprima, 90);
@@ -1155,7 +1169,7 @@ ol.passi code{background:var(--pannello-2);border:1px solid var(--bordo);border-
 
     shaCorrente = r.corpo.content.sha;
     ultimoSalvato = JSON.stringify(C);
-    try { localStorage.removeItem(CHIAVE_BOZZA); } catch (e) {}
+    try { localStorage.removeItem(CHIAVE_BOZZA); localStorage.removeItem(CHIAVE_BOZZA_SHA); } catch (e) {}
     b.disabled = false;
     toast('Salvato online');
     stato('<b>Salvato.</b> GitHub sta ricostruendo il sito: fra una trentina di secondi ' +

@@ -514,10 +514,29 @@ a{color:inherit}
     if (ev.key === 'Escape' && !$('#editor').hidden) chiudiEditor();
   });
 
+  /* GitHub Pages serve config.js con dieci minuti di cache: subito dopo
+     una pubblicazione il browser puo' ancora mostrare la versione
+     precedente, e sembra che le modifiche siano andate perse. Allora
+     disegniamo subito quello che abbiamo (veloce, sta in cache) e nel
+     frattempo controlliamo se online c'e' di meglio. */
+  async function controllaAggiornamenti() {
+    try {
+      var r = await fetch('config.js?v=' + Date.now(), { cache: 'no-store' });
+      if (!r.ok) return;
+      var finto = {};
+      new Function('window', await r.text())(finto);
+      if (finto.CONFIG && JSON.stringify(finto.CONFIG) !== JSON.stringify(C)) {
+        C = finto.CONFIG;
+        render();
+        collegaAperturaEditor();
+      }
+    } catch (e) {}
+  }
+
   render();
   collegaAperturaEditor();
   if (location.hash === '#edit') apriEditor();
-  if (!ANTEPRIMA) { caricaGA4(); traccia('visita', 'pagina', ''); }
+  if (!ANTEPRIMA) { caricaGA4(); traccia('visita', 'pagina', ''); controllaAggiornamenti(); }
 })();
 </script>
 </body>
