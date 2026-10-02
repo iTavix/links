@@ -1,5 +1,5 @@
 /* ==================================================================
-   CONFIG — generato da admin.html il 02/10/2026, 12:20:28
+   CONFIG — generato da admin.html il 02/10/2026, 12:21:39
    Puoi modificarlo a mano, ma è più comodo riaprire admin.html.
    ================================================================== */
 window.CONFIG = {
