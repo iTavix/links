@@ -103,6 +103,8 @@ button.icona{padding:7px;width:32px;height:32px}
   margin:0;padding:15px 18px;font-size:13px;font-weight:650;letter-spacing:.03em;text-transform:uppercase;
   color:var(--testo-2);border-bottom:1px solid var(--bordo)
 }
+.pannello > h2.con-azione{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 12px 11px 18px}
+.pannello > h2.con-azione button{text-transform:none;letter-spacing:0}
 .corpo{padding:16px 18px}
 .vista{display:none}
 .vista.attiva{display:block}
@@ -306,11 +308,14 @@ ol.passi code{background:var(--pannello-2);border:1px solid var(--bordo);border-
     <!-- ============ VISTA LINK ============ -->
     <section class="vista attiva" id="vista-link">
       <div class="pannello">
-        <h2>Pulsanti</h2>
+        <h2 class="con-azione">
+          <span>Pulsanti</span>
+          <button class="b pieno" id="btn-aggiungi">+ Aggiungi link</button>
+        </h2>
         <div class="corpo">
           <div class="righe" id="righe"></div>
           <div style="margin-top:13px;display:flex;gap:8px;flex-wrap:wrap">
-            <button class="b" id="btn-aggiungi">+ Aggiungi link</button>
+            <button class="b" id="btn-aggiungi-fondo">+ Aggiungi link</button>
             <button class="b fantasma" id="btn-espandi">Apri/chiudi tutti</button>
           </div>
         </div>
@@ -755,16 +760,26 @@ ol.passi code{background:var(--pannello-2);border:1px solid var(--bordo);border-
     indiceFoto = null;
   };
 
-  $('#btn-aggiungi').onclick = function () {
-    C.link.push({
-      id: 'link-' + (C.link.length + 1), titolo: 'Nuovo link', sottotitolo: '',
+  /* Il link nuovo nasce in cima, gia' aperto: con una lista lunga,
+     metterlo in fondo significherebbe doverlo andare a cercare. */
+  function aggiungiLink() {
+    var n = 1;
+    while (C.link.some(function (l) { return l.id === 'link-' + n; })) n++;
+    C.link.unshift({
+      id: 'link-' + n, titolo: '', sottotitolo: '',
       url: '', icona: 'link', evidenziato: false, badge: '', attivo: true
     });
-    aperte = {}; aperte[C.link.length - 1] = true;
+    aperte = { 0: true };
     disegnaLink(); segna();
-    var righe = $$('.riga', $('#righe'));
-    righe[righe.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
-  };
+    var prima = $('#righe .riga');
+    if (prima) {
+      prima.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      var campo = prima.querySelector('[data-campo="titolo"]');
+      if (campo) campo.focus();
+    }
+  }
+  $('#btn-aggiungi').onclick = aggiungiLink;
+  $('#btn-aggiungi-fondo').onclick = aggiungiLink;
   $('#btn-espandi').onclick = function () {
     var apriTutte = $$('.riga.aperta').length < C.link.length;
     C.link.forEach(function (_, i) { aperte[i] = apriTutte; });
@@ -1111,6 +1126,32 @@ ol.passi code{background:var(--pannello-2);border:1px solid var(--bordo);border-
     location.reload();
   };
 
+  /* Sostituendo l'immagine di un link, il file vecchio resterebbe nel
+     repository per sempre. Dopo che il config nuovo e' salvato — e solo
+     allora, cosi' non si cancella niente di ancora utile — togliamo i
+     file che nessun link usa piu'. Se qualcuna non si cancella pazienza:
+     e' pulizia, non deve far fallire un salvataggio andato a buon fine. */
+  async function pulisciOrfane() {
+    try {
+      var usate = {};
+      C.link.forEach(function (l) { if (l.immagine) usate[l.immagine] = true; });
+      var elenco = await chiamataGitHub('/contents/assets/link?ref=' + REPO.ramo);
+      if (!elenco.ok || !Array.isArray(elenco.corpo)) return;
+      for (var i = 0; i < elenco.corpo.length; i++) {
+        var f = elenco.corpo[i];
+        if (f.type !== 'file' || usate['assets/link/' + f.name]) continue;
+        await chiamataGitHub('/contents/assets/link/' + encodeURIComponent(f.name), {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: 'Rimuovo un\'immagine che nessun link usa piu\'',
+            sha: f.sha, branch: REPO.ramo
+          })
+        });
+      }
+    } catch (e) {}
+  }
+
   async function pubblica() {
     var b = $('#btn-pubblica');
     b.disabled = true;
@@ -1168,6 +1209,7 @@ ol.passi code{background:var(--pannello-2);border:1px solid var(--bordo);border-
     if (!r.ok) { stato('Salvataggio fallito: ' + spiegaErrore(r) + '.', 'ko'); b.disabled = false; return; }
 
     shaCorrente = r.corpo.content.sha;
+    await pulisciOrfane();
     ultimoSalvato = JSON.stringify(C);
     try { localStorage.removeItem(CHIAVE_BOZZA); localStorage.removeItem(CHIAVE_BOZZA_SHA); } catch (e) {}
     b.disabled = false;
