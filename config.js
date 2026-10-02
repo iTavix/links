@@ -1,5 +1,5 @@
 /* ==================================================================
-   CONFIG — generato da admin.html il 02/10/2026, 12:17:49
+   CONFIG — generato da admin.html il 02/10/2026, 12:19:25
    Puoi modificarlo a mano, ma è più comodo riaprire admin.html.
    ================================================================== */
 window.CONFIG = {
@@ -54,7 +54,7 @@ window.CONFIG = {
       "evidenziato": true,
       "badge": "",
       "attivo": true,
-      "immagine": "assets/link/link-1-1790957868578.png"
+      "immagine": "assets/link/link-1-1790957964736.png"
     },
     {
       "id": "steam-train",
