@@ -1,5 +1,5 @@
 /* ==================================================================
-   CONFIG — generato da admin.html il 02/10/2026, 12:19:25
+   CONFIG — generato da admin.html il 02/10/2026, 12:20:28
    Puoi modificarlo a mano, ma è più comodo riaprire admin.html.
    ================================================================== */
 window.CONFIG = {
@@ -52,9 +52,9 @@ window.CONFIG = {
       "url": "https://www.bricklink.com/v3/designer-program/2028-wave-1/main.page?page=1&s=brickup",
       "icona": "link",
       "evidenziato": true,
-      "badge": "",
+      "badge": "Vota",
       "attivo": true,
-      "immagine": "assets/link/link-1-1790957964736.png"
+      "immagine": "assets/link/link-1-1790957868578.png"
     },
     {
       "id": "steam-train",
